@@ -125,4 +125,4 @@ We welcome contributions that help us better serve Ghanaian market women and far
 
 ## 📞 Support
 
-For support, please reach out to via the link below 👉 [https://chat.whatsapp.com/EsZlYHLS1HRLq589A0G1Xg] 
+For support, please reach out via the link below 👇 [https://chat.whatsapp.com/EsZlYHLS1HRLq589A0G1Xg]
