@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, CheckCircle2, Shield, AlertCircle } from "lucide-react";
 
-export default function ResetPinPage() {
+function ResetPinForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get("phone");
@@ -192,5 +192,28 @@ export default function ResetPinPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPinPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center space-y-4">
+              <div className="mx-auto w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-2xl font-bold">MC</span>
+              </div>
+              <CardTitle className="text-2xl font-semibold text-gray-900">
+                Loading...
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+      }
+    >
+      <ResetPinForm />
+    </Suspense>
   );
 }
