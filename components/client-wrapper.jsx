@@ -1,18 +1,13 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
-import { usePathname } from "next/navigation";
 
 // List of paths that should not show the header and bottom nav
-const publicPaths = [
-  "/",
-  "/auth/login",
-  "/auth/register",
-  "/auth/forgot-password",
-];
+const publicPaths = ["/", "/auth/login", "/auth/register", "/auth/forgot-pin"];
 
-export function NavigationLayout({ children }) {
+export function ClientWrapper({ children }) {
   const pathname = usePathname();
   const shouldShowNav = !publicPaths.includes(pathname);
 

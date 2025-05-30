@@ -6,25 +6,23 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
+  const [showPin, setShowPin] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("Login attempt with:", { phoneNumber, password });
+    console.log("Login attempt with:", { phoneNumber, pin });
     router.push("/select-language");
   };
 
-  const handlePinLogin = (e) => {
-    e.preventDefault();
-    console.log("PIN login attempt with:", { phoneNumber, pin });
-    router.push("/select-language");
+  const togglePinVisibility = () => {
+    setShowPin(!showPin);
   };
 
   return (
@@ -39,86 +37,57 @@ export default function LoginPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="password" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="password">Phone & Password</TabsTrigger>
-              <TabsTrigger value="pin">Phone & PIN</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="password" className="space-y-4 mt-6">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700"
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pin">PIN</Label>
+              <div className="relative">
+                <Input
+                  id="pin"
+                  type={showPin ? "text" : "password"}
+                  placeholder="Enter your PIN"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  maxLength={6}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={togglePinVisibility}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  Login
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="pin" className="space-y-4 mt-6">
-              <form onSubmit={handlePinLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone-pin">Phone Number</Label>
-                  <Input
-                    id="phone-pin"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="pin">PIN</Label>
-                  <Input
-                    id="pin"
-                    type="password"
-                    placeholder="Enter your PIN"
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value)}
-                    maxLength={6}
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700"
-                >
-                  Login
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+                  {showPin ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              Login
+            </Button>
+          </form>
 
           <div className="mt-6 text-center space-y-4">
             <Link
-              href="/auth/forgot-password"
+              href="/auth/forgot-pin"
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
-              Forgot Password or PIN?
+              Forgot PIN?
             </Link>
             <p className="text-sm text-gray-600">
               {"Don't have an account? "}
