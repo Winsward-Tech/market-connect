@@ -40,6 +40,8 @@ const languages = [
 export default function SelectLanguage() {
   const [selectedLang, setSelectedLang] = useState(null);
   const [error, setError] = useState("");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -54,11 +56,43 @@ export default function SelectLanguage() {
     setError("");
 
     try {
+      // Stop any currently playing audio
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+
       const audio = new Audio(lang.audio);
+      setCurrentAudio(audio);
+
+      // Add event listeners
+      audio.onplay = () => setIsPlaying(true);
+      audio.onended = () => {
+        setIsPlaying(false);
+        setCurrentAudio(null);
+      };
+      audio.onerror = (e) => {
+        console.error("Audio error:", e);
+        setError("Could not play audio. Please check your sound settings.");
+        setIsPlaying(false);
+        setCurrentAudio(null);
+      };
+
       await audio.play();
     } catch (err) {
       console.error("Error playing audio:", err);
       setError("Could not play audio. Please check your sound settings.");
+      setIsPlaying(false);
+      setCurrentAudio(null);
+    }
+  };
+
+  const stopAudio = () => {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentAudio(null);
     }
   };
 
@@ -105,7 +139,19 @@ export default function SelectLanguage() {
                 </span>
                 <span className="text-lg font-medium">{lang.label}</span>
               </span>
-              <span className="text-xl">🔊</span>
+              {isPlaying && currentAudio?.src === lang.audio ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    stopAudio();
+                  }}
+                  className="text-xl hover:text-gray-600"
+                >
+                  ⏹️
+                </button>
+              ) : (
+                <span className="text-xl">🔊</span>
+              )}
             </button>
           ))}
         </div>

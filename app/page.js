@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,22 +51,142 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="auth/login">
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-6 py-6 text-lg rounded-full">
+              <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-full">
                 Get Started
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Button
-              variant="outline"
-              className="border-green-600 text-green-700 hover:bg-green-50 px-6 py-6 text-lg rounded-full"
-            >
-              Learn More
-              <BookOpen className="ml-2 h-5 w-5" />
-            </Button>
+            <Link href="#about">
+              <Button
+                variant="outline"
+                className="border-green-600 text-green-700 hover:bg-green-50 px-8 py-6 text-lg rounded-full"
+              >
+                Learn More
+                <BookOpen className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-yellow-200 rounded-full opacity-20 z-0"></div>
         <div className="absolute -top-16 -right-16 w-64 h-64 bg-green-200 rounded-full opacity-20 z-0"></div>
+      </section>
+
+      {/* About Section */}
+      <section
+        id="about"
+        className="py-20 px-4 bg-gradient-to-b from-white to-green-50"
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-green-800 mb-4">
+              About Market Connect
+            </h2>
+            <div className="w-24 h-1 bg-green-600 mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <div className="relative">
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-yellow-200 rounded-full opacity-50"></div>
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-green-200 rounded-full opacity-50"></div>
+              <div className="relative bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center">
+                    <Globe className="h-6 w-6 text-green-700" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-green-800">
+                    Our Mission
+                  </h3>
+                </div>
+                <p className="text-gray-700 leading-relaxed">
+                  Market Connect is dedicated to empowering Ghanaian market
+                  women and farmers by providing accessible education, fostering
+                  community connections, and creating new market opportunities.
+                  We believe in the power of technology to transform traditional
+                  markets and improve livelihoods across Ghana.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-blue-200 rounded-full opacity-50"></div>
+              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-yellow-200 rounded-full opacity-50"></div>
+              <div className="relative bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-700" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-green-800">
+                    Our Impact
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <p className="text-gray-700">
+                      Access quality education in local languages
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <p className="text-gray-700">
+                      Connect with buyers and sellers nationwide
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <p className="text-gray-700">
+                      Learn modern business techniques
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <p className="text-gray-700">
+                      Increase income through better market access
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -top-4 -left-4 w-32 h-32 bg-green-200 rounded-full opacity-50"></div>
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-yellow-200 rounded-full opacity-50"></div>
+            <div className="relative bg-gradient-to-r from-green-600 to-green-700 p-8 rounded-2xl shadow-lg text-white">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="bg-white/20 w-12 h-12 rounded-full flex items-center justify-center">
+                  <ShoppingBag className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold">Our Approach</h3>
+              </div>
+              <p className="text-white/90 leading-relaxed mb-6">
+                We combine traditional market knowledge with modern technology
+                to create a platform that's both accessible and effective. Our
+                content is available in multiple local languages, and we work
+                closely with community leaders to ensure our solutions meet real
+                needs.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold mb-2">5+</div>
+                  <p className="text-sm text-white/80">Local Languages</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold mb-2">100+</div>
+                  <p className="text-sm text-white/80">Community Leaders</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold mb-2">24/7</div>
+                  <p className="text-sm text-white/80">Support Available</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold mb-2">10+</div>
+                  <p className="text-sm text-white/80">Regions Covered</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Main Features */}
@@ -128,9 +250,13 @@ export default function Home() {
       {/* Statistics */}
       <section className="py-12 px-4 bg-green-700 text-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
-            Our Impact
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">
+            Shaping the Future of Ghanaian Markets
           </h2>
+          <p className="text-center text-green-100 mb-12 italic font-semibold">
+            Discover our bold goals and the lasting change we aim to achieve
+            within the next year.
+          </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="p-4">
               <div className="text-4xl md:text-5xl font-bold mb-2">5,000+</div>
@@ -156,19 +282,19 @@ export default function Home() {
       <section className="py-12 px-4 bg-green-50">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold text-center text-green-800 mb-8">
-            Success Stories
+            User Feedbacks
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TestimonialCard
               name="Ama Mensah"
               role="Market Woman, Kumasi"
-              quote="Market Connect helped me learn how to price my products better and find new customers. My business has grown by 30%!"
+              quote="With Market Connect, I expect to learn how to price my products better and reach new customers. I believe this could help my business grow significantly."
               image="/placeholder.svg?height=80&width=80"
             />
             <TestimonialCard
               name="Kofi Addo"
               role="Smallholder Farmer, Tamale"
-              quote="I learned new farming techniques and connected with buyers in Accra. Now I can sell my produce for better prices."
+              quote="I look forward to discovering new farming techniques and connecting with buyers in Accra through Market Connect. This should help me sell my produce at better prices."
               image="/placeholder.svg?height=80&width=80"
             />
           </div>

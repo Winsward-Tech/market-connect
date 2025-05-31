@@ -14,11 +14,21 @@ export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
+  const [pinError, setPinError] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
     console.log("Login attempt with:", { phoneNumber, pin });
     router.push("/select-language");
+  };
+
+  const handlePinChange = (e) => {
+    const value = e.target.value;
+    // Only allow numbers
+    if (/^\d*$/.test(value)) {
+      setPin(value);
+      setPinError("");
+    }
   };
 
   const togglePinVisibility = () => {
@@ -55,10 +65,13 @@ export default function LoginPage() {
                 <Input
                   id="pin"
                   type={showPin ? "text" : "password"}
-                  placeholder="Enter your PIN"
+                  placeholder="Enter your 6-digits PIN"
                   value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  maxLength={6}
+                  onChange={handlePinChange}
+                  minLength={6}
+                  maxLength={10}
+                  pattern="\d*"
+                  inputMode="numeric"
                   required
                 />
                 <button
@@ -73,6 +86,7 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+              {pinError && <p className="text-sm text-red-500">{pinError}</p>}
             </div>
             <Button
               type="submit"
