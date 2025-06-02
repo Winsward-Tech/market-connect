@@ -2,83 +2,129 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { BookOpen, ShoppingBag, Users, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import HomeNavbar from "@/components/HomeNavbar";
+import clsx from "clsx";
+
+const navItems = [
+  {
+    href: "/learning",
+    icon: BookOpen,
+    label: "Learn",
+    description: "Learn new farming and business skills",
+    color: "bg-blue-50",
+    iconColor: "text-blue-600",
+  },
+  {
+    href: "/marketplace",
+    icon: ShoppingBag,
+    label: "Buy & Sell",
+    description: "Trade your products with others",
+    color: "bg-green-50",
+    iconColor: "text-green-600",
+  },
+  {
+    href: "/community",
+    icon: Users,
+    label: "Talk to Others",
+    description: "Connect with other farmers and traders",
+    color: "bg-yellow-50",
+    iconColor: "text-yellow-600",
+  },
+  {
+    href: "/profile",
+    icon: User,
+    label: "My Info",
+    description: "View and update your information",
+    color: "bg-purple-50",
+    iconColor: "text-purple-600",
+  },
+];
+
+function NavCard({ href, icon: Icon, label, description, color, iconColor }) {
+  return (
+    <Link href={href} className="block h-full">
+      <Card
+        className={`h-full min-h-[200px] p-4 shadow hover:shadow-lg cursor-pointer transition-all duration-300 ${color} hover:scale-[1.02]`}
+      >
+        <CardContent className="p-0 flex flex-col items-center justify-center h-full space-y-3">
+          <div className="p-3 rounded-full transition duration-300">
+            <Icon className={`h-8 w-8 ${iconColor}`} />
+          </div>
+          <div className="text-center">
+            <p className="font-bold text-gray-900 text-lg md:text-xl">
+              {label}
+            </p>
+            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+              {description}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
 
 export default function HomeScreen() {
+  const pathname = usePathname();
+
   return (
-    <div className="min-h-[calc(100vh-8rem)] bg-green-50 flex flex-col items-center p-4">
-      <div className="mt-4 flex flex-col items-center space-y-3">
-        {/* Logo */}
-        <div className="w-20 h-20 bg-green-800 rounded-full flex items-center justify-center shadow-md">
-          <span className="text-white text-3xl font-bold">↟</span>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      <HomeNavbar />
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <section className="space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Welcome to Market Connect
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Your one-stop platform for farming, trading, and community
+              engagement
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-8">
+            {navItems.map((item) => (
+              <NavCard key={item.href} {...item} />
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-50">
+        <div className="grid grid-cols-4 h-16">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-label={`Go to ${item.label}`}
+                className="flex flex-col items-center justify-center py-2 space-y-1"
+              >
+                <item.icon
+                  className={clsx(
+                    "h-6 w-6",
+                    isActive ? "text-green-700" : item.iconColor
+                  )}
+                />
+                <span
+                  className={clsx(
+                    "text-xs font-medium",
+                    isActive ? "text-green-700" : "text-gray-600"
+                  )}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </div>
-
-        {/* Title */}
-        <div className="text-center max-w-2xl">
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">
-            Empowering Our Markets,
-          </h1>
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">
-            Growing Our Future
-          </h1>
-          <p className="text-yellow-600 text-sm md:text-base font-semibold mt-1">
-            Sus. Gya. Yɛn Bom (Learn, Trade, Together)
-          </p>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 w-full max-w-6xl px-4">
-        <Link href="/learning" className="block">
-          <Card className="h-full p-4 text-center shadow hover:shadow-md cursor-pointer transition hover:bg-green-50">
-            <CardContent className="p-0 flex flex-col items-center justify-center h-full">
-              <div className="text-yellow-600 text-3xl md:text-4xl mb-3">
-                📖
-              </div>
-              <p className="font-semibold text-gray-800 text-sm md:text-base">
-                Explore Learning Modules
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/marketplace" className="block">
-          <Card className="h-full p-4 text-center shadow hover:shadow-md cursor-pointer transition hover:bg-green-50">
-            <CardContent className="p-0 flex flex-col items-center justify-center h-full">
-              <div className="text-yellow-600 text-3xl md:text-4xl mb-3">
-                🛒
-              </div>
-              <p className="font-semibold text-gray-800 text-sm md:text-base">
-                Browse Products
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/community" className="block">
-          <Card className="h-full p-4 text-center shadow hover:shadow-md cursor-pointer transition hover:bg-green-50">
-            <CardContent className="p-0 flex flex-col items-center justify-center h-full">
-              <div className="text-yellow-600 text-3xl md:text-4xl mb-3">
-                👥
-              </div>
-              <p className="font-semibold text-gray-800 text-sm md:text-base">
-                Join the Community
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/profile" className="block">
-          <Card className="h-full p-4 text-center shadow hover:shadow-md cursor-pointer transition hover:bg-green-50">
-            <CardContent className="p-0 flex flex-col items-center justify-center h-full">
-              <div className="text-yellow-600 text-3xl md:text-4xl mb-3">
-                👤
-              </div>
-              <p className="font-semibold text-gray-800 text-sm md:text-base">
-                Access Your Profile
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
       </div>
     </div>
   );

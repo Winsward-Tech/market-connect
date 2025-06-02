@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Volume2, VolumeX } from "lucide-react";
 
 const languages = [
   {
@@ -10,30 +12,35 @@ const languages = [
     code: "twi",
     flag: "/flags/ghana_flag.png",
     audio: "/audio/twi.mp3",
+    description: "Select Twi as your language",
   },
   {
     label: "Ewe",
     code: "ewe",
     flag: "/flags/ghana_flag.png",
     audio: "/audio/ewe.mp3",
+    description: "Select Ewe as your language",
   },
   {
     label: "Ga",
     code: "ga",
     flag: "/flags/ghana_flag.png",
     audio: "/audio/ga.mp3",
+    description: "Select Ga as your language",
   },
   {
     label: "Dagbani",
     code: "dagbani",
     flag: "/flags/ghana_flag.png",
     audio: "/audio/dagbani.mp3",
+    description: "Select Dagbani as your language",
   },
   {
     label: "English",
     code: "en",
     flag: "/flags/uk_flag.png",
     audio: "/audio/english.mp3",
+    description: "Select English as your language",
   },
 ];
 
@@ -104,69 +111,92 @@ export default function SelectLanguage() {
   };
 
   return (
-    <div className="min-h-screen bg-green-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-6">
-        <button onClick={() => router.back()} className="text-sm text-gray-500">
-          ← Back
-        </button>
-        <h2 className="text-xl font-semibold text-gray-800 text-center">
-          Select Language
-        </h2>
-
-        {error && (
-          <div className="text-red-500 text-sm text-center">{error}</div>
-        )}
-
-        <div className="space-y-3">
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              className={`flex items-center justify-between w-full p-4 rounded-lg border ${
-                selectedLang === lang.code
-                  ? "border-green-600 bg-green-100"
-                  : "border-gray-200"
-              }`}
-              onClick={() => handleSelect(lang)}
-            >
-              <span className="flex items-center space-x-3">
-                <span className="w-8 h-6 relative">
-                  <Image
-                    src={lang.flag}
-                    alt={`${lang.label} flag`}
-                    fill
-                    className="object-cover rounded"
-                  />
-                </span>
-                <span className="text-lg font-medium">{lang.label}</span>
-              </span>
-              {isPlaying && currentAudio?.src === lang.audio ? (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    stopAudio();
-                  }}
-                  className="text-xl hover:text-gray-600"
-                >
-                  ⏹️
-                </button>
-              ) : (
-                <span className="text-xl">🔊</span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={confirmSelection}
-          className={`w-full py-3 rounded-lg text-white font-semibold ${
-            selectedLang
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-gray-300 cursor-not-allowed"
-          }`}
-          disabled={!selectedLang}
+    <div className="min-h-screen bg-green-50 flex flex-col">
+      {/* Header */}
+      <div className="bg-white p-4 shadow-sm">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-600"
         >
-          Confirm Selection
-        </button>
+          <ArrowLeft className="h-5 w-5" />
+          <span>Go Back</span>
+        </Button>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Choose Your Language
+            </h1>
+            <p className="text-gray-600">
+              Select the language you are most comfortable with
+            </p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-center">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                className={`flex items-center justify-between w-full p-4 rounded-lg border transition-all ${
+                  selectedLang === lang.code
+                    ? "border-green-600 bg-green-50"
+                    : "border-gray-200 hover:border-green-300"
+                }`}
+                onClick={() => handleSelect(lang)}
+                aria-label={lang.description}
+              >
+                <span className="flex items-center space-x-4">
+                  <span className="w-10 h-8 relative">
+                    <Image
+                      src={lang.flag}
+                      alt={`${lang.label} flag`}
+                      fill
+                      className="object-cover rounded"
+                    />
+                  </span>
+                  <span className="text-lg font-medium">{lang.label}</span>
+                </span>
+                {isPlaying && currentAudio?.src === lang.audio ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      stopAudio();
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-full"
+                    aria-label="Stop audio"
+                  >
+                    <VolumeX className="h-6 w-6 text-gray-600" />
+                  </button>
+                ) : (
+                  <span className="p-2 hover:bg-gray-100 rounded-full">
+                    <Volume2 className="h-6 w-6 text-gray-600" />
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <Button
+            onClick={confirmSelection}
+            className={`w-full py-6 text-lg font-semibold ${
+              selectedLang
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-gray-300 cursor-not-allowed"
+            }`}
+            disabled={!selectedLang}
+          >
+            {selectedLang ? "Continue" : "Please select a language"}
+          </Button>
+        </div>
       </div>
     </div>
   );
