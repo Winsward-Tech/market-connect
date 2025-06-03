@@ -11,12 +11,24 @@ import {
   VolumeIcon as VolumeUp,
   Edit,
   Plus,
+  BarChart3,
+  Package,
+  MessageSquare,
+  TrendingUp,
+  DollarSign,
+  Users,
+  Home,
+  Store,
+  Bell,
+  CreditCard,
+  Shield,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState("products");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -41,227 +53,392 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="container mx-auto py-8 px-4">
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="relative">
-              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg">
-                <User className="h-16 w-16 text-white" />
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white h-[calc(100vh-4rem)] sticky top-16 shadow-md hidden md:block">
+          <div className="p-4">
+            <div className="space-y-1">
+              <Link href="/profile">
+                <Button variant="ghost" className="w-full justify-start gap-2">
+                  <Home className="h-5 w-5" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link href="/profile/products">
+                <Button variant="ghost" className="w-full justify-start gap-2">
+                  <Store className="h-5 w-5" />
+                  My Products
+                </Button>
+              </Link>
+              <Link href="/profile/orders">
+                <Button variant="ghost" className="w-full justify-start gap-2">
+                  <ShoppingBag className="h-5 w-5" />
+                  Orders
+                </Button>
+              </Link>
+              <Link href="/profile/messages">
+                <Button variant="ghost" className="w-full justify-start gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  Messages
+                </Button>
+              </Link>
+              <Link href="/profile/notifications">
+                <Button variant="ghost" className="w-full justify-start gap-2">
+                  <Bell className="h-5 w-5" />
+                  Notifications
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-8">
+              <h3 className="px-4 text-sm font-semibold text-gray-500">
+                Settings
+              </h3>
+              <div className="mt-2 space-y-1">
+                <Link href="/profile/settings">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                  >
+                    <Settings className="h-5 w-5" />
+                    Account Settings
+                  </Button>
+                </Link>
+                <Link href="/profile/payments">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                  >
+                    <CreditCard className="h-5 w-5" />
+                    Payment Methods
+                  </Button>
+                </Link>
+                <Link href="/profile/privacy">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                  >
+                    <Shield className="h-5 w-5" />
+                    Privacy
+                  </Button>
+                </Link>
               </div>
+            </div>
+
+            <div className="mt-8">
               <Button
-                size="icon"
-                className="absolute bottom-0 right-0 bg-green-600 hover:bg-green-700 rounded-full h-10 w-10 shadow-md"
+                variant="ghost"
+                className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Edit className="h-5 w-5" />
+                <LogOut className="h-5 w-5" />
+                Logout
               </Button>
             </div>
+          </div>
+        </aside>
 
-            <div className="text-center md:text-left flex-1">
-              <h2 className="text-2xl font-bold">Ama Mensah</h2>
-              <p className="text-gray-600 mb-2">Market Woman, Kumasi</p>
-              <div className="flex items-center justify-center md:justify-start mb-4">
-                <div className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm flex items-center mr-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4 mr-1"
-                  >
-                    <path d="M2 22s4-2 8-2 8 2 8 2" />
-                    <path d="M2 2s4 2 8 2 8-2 8-2" />
-                    <path d="M12 12c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2s2 .9 2 2v4c0 1.1-.9 2-2 2z" />
-                    <path d="M12 12c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2s-2-.9-2-2v-4c0-1.1.9-2 2-2z" />
-                  </svg>
-                  Vegetables
+        {/* Main Content */}
+        <main className="flex-1 p-8">
+          {/* Profile Card */}
+          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg">
+                  <User className="h-16 w-16 text-white" />
                 </div>
-                <div className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-sm flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4 mr-1"
-                  >
-                    <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
-                  </svg>
-                  Fruits
-                </div>
-                <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4 mr-1"
-                  >
-                    <circle cx="9" cy="21" r="1" />
-                    <circle cx="20" cy="21" r="1" />
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                  </svg>
-                  Retail
-                </div>
+                <Button
+                  size="icon"
+                  className="absolute bottom-0 right-0 bg-green-600 hover:bg-green-700 rounded-full h-10 w-10 shadow-md"
+                >
+                  <Edit className="h-5 w-5" />
+                </Button>
               </div>
 
-              <p className="text-gray-700 mb-4 max-w-lg mx-auto md:mx-0">
-                I sell fresh vegetables and fruits at Kumasi Central Market.
-                I've been in this business for over 10 years and joined Market
-                Connect to expand my customer base.
-              </p>
+              <div className="text-center md:text-left flex-1">
+                <h2 className="text-2xl font-bold">Ama Mensah</h2>
+                <p className="text-gray-600 mb-2">Market Woman, Kumasi</p>
+                <div className="flex items-center justify-center md:justify-start mb-4">
+                  <div className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm flex items-center mr-2">
+                    <Package className="w-4 h-4 mr-1" />
+                    Vegetables
+                  </div>
+                  <div className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-sm flex items-center mr-2">
+                    <Package className="w-4 h-4 mr-1" />
+                    Fruits
+                  </div>
+                  <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm flex items-center">
+                    <Package className="w-4 h-4 mr-1" />
+                    Retail
+                  </div>
+                </div>
+
+                <p className="text-gray-700 mb-4 max-w-lg mx-auto md:mx-0">
+                  I sell fresh vegetables and fruits at Kumasi Central Market.
+                  I've been in this business for over 10 years and joined Market
+                  Connect to expand my customer base.
+                </p>
+              </div>
+
+              <div className="ml-auto hidden md:block">
+                <Button className="bg-green-600 hover:bg-green-700 mb-2 w-full">
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-green-200 text-green-700 hover:bg-green-50 w-full"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Contact
+                </Button>
+              </div>
             </div>
 
-            <div className="ml-auto hidden md:block">
-              <Button className="bg-green-600 hover:bg-green-700 mb-2 w-full">
+            <div className="flex flex-col sm:flex-row gap-2 mt-4 md:hidden">
+              <Button className="bg-green-600 hover:bg-green-700 flex-1">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Profile
               </Button>
               <Button
                 variant="outline"
-                className="border-green-200 text-green-700 hover:bg-green-50 w-full"
+                className="border-green-200 text-green-700 hover:bg-green-50 flex-1"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-4 h-4 mr-2"
-                >
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
+                <MessageSquare className="w-4 h-4 mr-2" />
                 Contact
               </Button>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 mt-4 md:hidden">
-            <Button className="bg-green-600 hover:bg-green-700 flex-1">
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
-            <Button
-              variant="outline"
-              className="border-green-200 text-green-700 hover:bg-green-50 flex-1"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4 mr-2"
-              >
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-              Contact
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t">
-            <Link
-              href="/profile/products"
-              className="text-center bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <div className="text-2xl font-bold text-green-600">3</div>
-              <div className="text-sm text-gray-600">Products</div>
-            </Link>
-            <div className="text-center bg-gray-50 p-3 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">144</div>
-              <div className="text-sm text-gray-600">Views</div>
-            </div>
-            <div className="text-center bg-gray-50 p-3 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">35</div>
-              <div className="text-sm text-gray-600">Inquiries</div>
-            </div>
-            <div className="text-center bg-gray-50 p-3 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600">7</div>
-              <div className="text-sm text-gray-600">Posts</div>
-            </div>
-          </div>
-        </div>
-
-        <Tabs defaultValue="products" className="mb-8">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="products" className="text-lg py-3">
-              <ShoppingBag className="mr-2 h-4 w-4" />
-              Products
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="text-lg py-3">
-              <BookOpen className="mr-2 h-4 w-4" />
-              Reviews
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="text-lg py-3">
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="products">
+          {/* Dashboard Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">My Products</h2>
-                <Link href="/profile/products/add">
-                  <Button className="bg-green-600 hover:bg-green-700">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add New Product
-                  </Button>
-                </Link>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total Sales</p>
+                  <h3 className="text-2xl font-bold">₵2,450</h3>
+                </div>
+                <div className="bg-green-100 p-3 rounded-full">
+                  <DollarSign className="h-6 w-6 text-green-600" />
+                </div>
               </div>
-              <div className="text-center py-8">
-                <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">Manage Your Products</h3>
-                <p className="text-gray-500 mb-4">
-                  Add and manage your products to reach more customers
-                </p>
-                <Link href="/profile/products">
-                  <Button className="bg-green-600 hover:bg-green-700">
-                    View All Products
-                  </Button>
-                </Link>
+              <div className="mt-4 flex items-center text-green-600">
+                <TrendingUp className="h-4 w-4 mr-1" />
+                <span className="text-sm">+12% from last month</span>
               </div>
             </div>
-          </TabsContent>
-          <TabsContent value="reviews">
-            <div className="text-center py-8">
-              <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">No Reviews Yet</h3>
-              <p className="text-gray-500">
-                Customer reviews will appear here when they rate your products.
-              </p>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Active Products</p>
+                  <h3 className="text-2xl font-bold">24</h3>
+                </div>
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <Package className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center text-blue-600">
+                <TrendingUp className="h-4 w-4 mr-1" />
+                <span className="text-sm">+3 new this week</span>
+              </div>
             </div>
-          </TabsContent>
-          <TabsContent value="settings">
-            <div className="text-center py-8">
-              <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">Account Settings</h3>
-              <p className="text-gray-500">
-                Manage your account preferences and notifications.
-              </p>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total Views</p>
+                  <h3 className="text-2xl font-bold">1,234</h3>
+                </div>
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <Users className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center text-purple-600">
+                <TrendingUp className="h-4 w-4 mr-1" />
+                <span className="text-sm">+28% from last week</span>
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Inquiries</p>
+                  <h3 className="text-2xl font-bold">45</h3>
+                </div>
+                <div className="bg-orange-100 p-3 rounded-full">
+                  <MessageSquare className="h-6 w-6 text-orange-600" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center text-orange-600">
+                <TrendingUp className="h-4 w-4 mr-1" />
+                <span className="text-sm">+15% from last month</span>
+              </div>
+            </div>
+          </div>
+
+          <Tabs defaultValue="dashboard" className="mb-8">
+            <TabsList className="grid w-full grid-cols-4 mb-8">
+              <TabsTrigger value="dashboard" className="text-lg py-3">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="products" className="text-lg py-3">
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                Products
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="text-lg py-3">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Reviews
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="text-lg py-3">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="dashboard">
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">Recent Activity</h2>
+                  <Button
+                    variant="outline"
+                    className="text-green-600 border-green-200"
+                  >
+                    View All
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                    <div className="bg-green-100 p-2 rounded-full mr-4">
+                      <DollarSign className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">New Sale</p>
+                      <p className="text-sm text-gray-500">Tomatoes - 5kg</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">₵120</p>
+                      <p className="text-sm text-gray-500">2 hours ago</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                    <div className="bg-blue-100 p-2 rounded-full mr-4">
+                      <MessageSquare className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">New Inquiry</p>
+                      <p className="text-sm text-gray-500">
+                        About your vegetables
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">John Doe</p>
+                      <p className="text-sm text-gray-500">5 hours ago</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="products">
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">My Products</h2>
+                  <Link href="/profile/products/add">
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add New Product
+                    </Button>
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Sample Product Cards */}
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
+                    <h3 className="font-medium">Fresh Tomatoes</h3>
+                    <p className="text-sm text-gray-500 mb-2">₵5.99/kg</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-green-600">In Stock</span>
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
+                    <h3 className="font-medium">Green Beans</h3>
+                    <p className="text-sm text-gray-500 mb-2">₵3.99/kg</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-green-600">In Stock</span>
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
+                    <h3 className="font-medium">Sweet Potatoes</h3>
+                    <p className="text-sm text-gray-500 mb-2">₵4.50/kg</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-green-600">In Stock</span>
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="reviews">
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="text-center py-8">
+                  <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">No Reviews Yet</h3>
+                  <p className="text-gray-500">
+                    Your customers haven't left any reviews yet. Keep providing
+                    great service!
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="settings">
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-6">Account Settings</h2>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">Notifications</p>
+                      <p className="text-sm text-gray-500">
+                        Manage your notification preferences
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">Privacy</p>
+                      <p className="text-sm text-gray-500">
+                        Manage your privacy settings
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">Payment Methods</p>
+                      <p className="text-sm text-gray-500">
+                        Manage your payment options
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </main>
       </div>
     </div>
   );

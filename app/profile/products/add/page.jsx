@@ -29,7 +29,7 @@ export default function AddProductPage() {
       {/* Header */}
       <header className="bg-green-700 text-white p-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Link href="/profile/products">
+          <Link href="/profile">
             <Button variant="ghost" className="text-white p-0 mr-2">
               <ArrowLeft className="h-5 w-5" />
             </Button>
