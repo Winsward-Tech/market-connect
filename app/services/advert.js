@@ -22,5 +22,35 @@ export const apiGetDeletedAdverts = async () =>
 export const apiRestoreAdvert = async (id) =>
   apiClient.put(`/adverts-restore/${id}`);
 
+export const createProduct = async (productData) => {
+  try {
+    const response = await apiClient.post("/api/products", productData);
+    return response;
+  } catch (error) {
+    console.error("Error creating product:", error);
+    throw error;
+  }
+};
 
+export const updateProduct = async (productId, productData) => {
+  try {
+    const response = await apiClient.put(
+      `/api/products/${productId}`,
+      productData
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating product:", error);
+    throw error;
+  }
+};
 
+export const getProductById = async (productId) => {
+  try {
+    const response = await apiClient.get(`/api/products/${productId}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    throw error;
+  }
+};

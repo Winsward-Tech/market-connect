@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
+import { verifyOTP, sendOTP } from "@/app/services/auth";
 
 function VerifyOTPForm() {
   const router = useRouter();
@@ -19,7 +20,7 @@ function VerifyOTPForm() {
   const [showOtp, setShowOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [timeLeft, setTimeLeft] = useState(60); // 60 seconds countdown
+  const [timeLeft, setTimeLeft] = useState(300); // Changed to 5 minutes (300 seconds)
   const [canResend, setCanResend] = useState(false);
 
   const inputRefs = useRef([]);
@@ -97,26 +98,17 @@ function VerifyOTPForm() {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         router.push(`/auth/reset-pin?phone=${encodeURIComponent(phone)}`);
       } else {
-        // Handle other verification purposes
-        const res = await fetch("/api/auth/verify-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, otp: otpString, purpose }),
-        });
+        // Verify OTP with the backend
+        await verifyOTP(phone, otpString);
 
-        if (res.ok) {
-          if (purpose === "reset-pin") {
-            router.push(`/auth/reset-pin?phone=${encodeURIComponent(phone)}`);
-          } else {
-            router.push("/select-language");
-          }
+        if (purpose === "register") {
+          router.push("/auth/login");
         } else {
-          const data = await res.json();
-          setError(data.message || "Invalid verification code");
+          router.push("/select-language");
         }
       }
     } catch (err) {
-      setError("Something went wrong");
+      setError(err.message || "Invalid verification code");
     } finally {
       setLoading(false);
     }
@@ -127,30 +119,25 @@ function VerifyOTPForm() {
 
     setLoading(true);
     setError("");
-    setCanResend(false);
-    setTimeLeft(60);
-    setOtp(["", "", "", "", "", ""]);
-
     try {
-      if (purpose === "reset-pin") {
-        await fetch("/api/auth/request-pin-reset", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phoneNumber: phone }),
-        });
-      } else {
-        // Handle other verification purposes
-        await fetch("/api/auth/resend-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, purpose }),
-        });
-      }
+      await sendOTP(phone);
+      setCanResend(false);
+      setTimeLeft(300);
+      setOtp(["", "", "", "", "", ""]);
     } catch (err) {
-      setError("Failed to resend code");
+      setError(err.message || "Failed to resend OTP");
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return {
+      minutes: minutes.toString().padStart(2, "0"),
+      seconds: remainingSeconds.toString().padStart(2, "0"),
+    };
   };
 
   return (
@@ -158,13 +145,18 @@ function VerifyOTPForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">MC</span>
+            <img
+              src="/images/Ghana Market-logo.png"
+              alt="Market Connect Logo"
+              className="h-12 w-12"
+            />
           </div>
           <CardTitle className="text-2xl font-semibold text-gray-900">
             Verify Your Phone
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Enter the 6-digit code sent to {phone}
+            Enter the 6-digit code sent to{" "}
+            <span className="text-green-600 font-medium">{phone}</span>
           </p>
         </CardHeader>
 
@@ -215,27 +207,41 @@ function VerifyOTPForm() {
               {loading ? "Verifying..." : "Verify Code"}
             </Button>
 
-            <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">
-                {timeLeft > 0 ? (
-                  `Resend code in ${timeLeft} seconds`
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleResend}
-                    disabled={!canResend || loading}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Resend Code
-                  </button>
-                )}
-              </p>
-              <Link
-                href="/auth/login"
-                className="text-sm text-blue-600 hover:text-blue-800"
-              >
-                Back to Login
-              </Link>
+            <div className="text-center space-y-4">
+              {timeLeft > 0 ? (
+                <div className="inline-flex items-center space-x-4 bg-green-50 px-4 py-2 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {formatTime(timeLeft).minutes}
+                    </div>
+                    <div className="text-xs text-green-600">Minutes</div>
+                  </div>
+                  <div className="text-2xl font-bold text-green-600">:</div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {formatTime(timeLeft).seconds}
+                    </div>
+                    <div className="text-xs text-green-600">Seconds</div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={!canResend || loading}
+                  className="text-green-600 hover:text-green-700 font-medium"
+                >
+                  Resend Code
+                </button>
+              )}
+              <div>
+                <Link
+                  href="/auth/login"
+                  className="text-sm text-green-600 hover:text-green-700 font-medium"
+                >
+                  Resend OTP
+                </Link>
+              </div>
             </div>
           </form>
         </CardContent>
@@ -252,7 +258,11 @@ export default function VerifyOTPPage() {
           <Card className="w-full max-w-md">
             <CardHeader className="text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">MC</span>
+                <img
+                  src="/images/Ghana Market-logo.png"
+                  alt="Market Connect Logo"
+                  className="h-12 w-12"
+                />
               </div>
               <CardTitle className="text-2xl font-semibold text-gray-900">
                 Loading...

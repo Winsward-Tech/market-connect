@@ -7,6 +7,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { initiateResetPin } from "@/app/services/auth";
+
+const formatPhoneNumber = (phone) => {
+  // Remove any non-digit characters
+  const cleaned = phone.replace(/\D/g, "");
+
+  // If the number starts with 0, replace it with 233
+  if (cleaned.startsWith("0")) {
+    return `233${cleaned.slice(1)}`;
+  }
+
+  // If the number already starts with 233, return as is
+  if (cleaned.startsWith("233")) {
+    return cleaned;
+  }
+
+  // If the number doesn't start with 0 or 233, assume it's a local number
+  return `233${cleaned}`;
+};
 
 export default function ForgotPinPage() {
   const router = useRouter();
@@ -14,43 +33,47 @@ export default function ForgotPinPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const useMock = true; // switch to false when backend is ready
-
   const handleForgotPin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    try {
-      if (useMock) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        router.push(
-          `/auth/verify-otp?phone=${encodeURIComponent(
-            phoneNumber
-          )}&purpose=reset-pin`
-        );
-      } else {
-        const res = await fetch("/api/auth/request-pin-reset", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phoneNumber }),
-        });
+    // Basic validation
+    if (
+      !phoneNumber.startsWith("0") ||
+      phoneNumber.length !== 10 ||
+      !/^\d+$/.test(phoneNumber)
+    ) {
+      setError("Please enter a valid phone number starting with 0");
+      setLoading(false);
+      return;
+    }
 
-        if (res.ok) {
-          router.push(
-            `/auth/verify-otp?phone=${encodeURIComponent(
-              phoneNumber
-            )}&purpose=reset-pin`
-          );
-        } else {
-          const data = await res.json();
-          setError(data.message || "Failed to send reset code");
-        }
-      }
+    try {
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      await initiateResetPin(formattedPhone);
+      
+      router.push(
+        `/auth/verify-otp?phone=${encodeURIComponent(
+          formattedPhone
+        )}&purpose=reset-pin`
+      );
     } catch (err) {
-      setError("Something went wrong");
+      setError(err.message || "Failed to send reset code");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    // Only allow numbers, must start with 0, and limit to 10 digits
+    if (
+      /^\d*$/.test(value) &&
+      value.length <= 10 &&
+      (value === "" || value.startsWith("0"))
+    ) {
+      setPhoneNumber(value);
     }
   };
 
@@ -59,7 +82,11 @@ export default function ForgotPinPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">MC</span>
+            <img
+              src="/images/Ghana Market-logo.png"
+              alt="Market Connect Logo"
+              className="h-12 w-12"
+            />
           </div>
           <CardTitle className="text-2xl font-semibold text-gray-900">
             Forgot PIN
@@ -73,9 +100,12 @@ export default function ForgotPinPage() {
               <Input
                 id="phone"
                 type="tel"
-                placeholder="Enter your phone number"
+                placeholder="0XXXXXXXXX"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={handlePhoneChange}
+                maxLength={10}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 required
               />
             </div>
@@ -92,7 +122,7 @@ export default function ForgotPinPage() {
           <div className="text-center">
             <Link
               href="/auth/login"
-              className="text-sm text-blue-600 hover:text-blue-800"
+              className="text-sm text-green-600 hover:text-green-700 font-medium"
             >
               Back to Login
             </Link>

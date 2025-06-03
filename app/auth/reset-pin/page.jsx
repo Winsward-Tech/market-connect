@@ -104,7 +104,11 @@ function ResetPinForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">MC</span>
+            <img
+              src="/images/Ghana Market-logo.png"
+              alt="Market Connect Logo"
+              className="h-12 w-12"
+            />
           </div>
           <CardTitle className="text-2xl font-semibold text-gray-900">
             Reset Your PIN
@@ -203,7 +207,11 @@ export default function ResetPinPage() {
           <Card className="w-full max-w-md">
             <CardHeader className="text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">MC</span>
+                <img
+                  src="/images/Ghana Market-logo.png"
+                  alt="Market Connect Logo"
+                  className="h-12 w-12"
+                />
               </div>
               <CardTitle className="text-2xl font-semibold text-gray-900">
                 Loading...

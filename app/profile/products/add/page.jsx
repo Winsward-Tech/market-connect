@@ -1,169 +1,240 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft, Camera, Upload } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Upload } from "lucide-react";
+import { createProduct } from "@/app/services/advert";
+import { toast } from "sonner";
 
 export default function AddProductPage() {
-  const [images, setImages] = useState([]);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    price: "",
+    category: "vegetables",
+    quantity: "",
+    unit: "kg",
+    image: null,
+  });
 
-  const handleImageUpload = (e) => {
-    // Handle image upload logic here
-    console.log("Image upload triggered");
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        image: file,
+      }));
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Convert price and quantity to numbers
+      const productData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        quantity: parseInt(formData.quantity),
+      };
+
+      const response = await createProduct(productData);
+
+      if (response?.data?.data) {
+        toast.success("Product created successfully");
+        router.push("/profile/products");
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to create product");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-green-50">
-      {/* Header */}
-      <header className="bg-green-700 text-white p-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Link href="/profile">
-            <Button variant="ghost" className="text-white p-0 mr-2">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <h1 className="text-xl font-bold">Add New Product</h1>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-green-700 text-white p-4 flex items-center sticky top-0 z-50 shadow-md">
+        <Button
+          variant="ghost"
+          className="text-white p-0 mr-2"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-xl font-bold">Add New Product</h1>
       </header>
 
-      <div className="container mx-auto py-8 px-4">
+      <div className="max-w-2xl mx-auto p-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Product Information</CardTitle>
+            <CardTitle>Product Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="title" className="text-lg">
-                    Product Name
-                  </Label>
-                  <Input
-                    id="title"
-                    placeholder="Enter product name"
-                    className="mt-1 text-lg py-6"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="price" className="text-lg">
-                      Price
-                    </Label>
-                    <Input
-                      id="price"
-                      placeholder="Enter price"
-                      className="mt-1 text-lg py-6"
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <Label>Product Image</Label>
+                <div className="flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="max-h-48 object-contain"
+                        />
+                      ) : (
+                        <>
+                          <Upload className="w-8 h-8 mb-4 text-gray-500" />
+                          <p className="mb-2 text-sm text-gray-500">
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>{" "}
+                            or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            PNG, JPG or JPEG
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
                     />
-                  </div>
-                  <div>
-                    <Label htmlFor="unit" className="text-lg">
-                      Unit
-                    </Label>
-                    <Select>
-                      <SelectTrigger className="mt-1 text-lg py-6">
-                        <SelectValue placeholder="Select unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="kg">Kilogram (kg)</SelectItem>
-                        <SelectItem value="g">Gram (g)</SelectItem>
-                        <SelectItem value="piece">Piece</SelectItem>
-                        <SelectItem value="bunch">Bunch</SelectItem>
-                        <SelectItem value="bag">Bag</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="category" className="text-lg">
-                    Category
-                  </Label>
-                  <Select>
-                    <SelectTrigger className="mt-1 text-lg py-6">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="vegetables">Vegetables</SelectItem>
-                      <SelectItem value="fruits">Fruits</SelectItem>
-                      <SelectItem value="grains">Grains</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="description" className="text-lg">
-                    Description
-                  </Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe your product..."
-                    className="mt-1 text-lg min-h-[100px]"
-                  />
+                  </label>
                 </div>
               </div>
 
-              {/* Images */}
-              <div className="space-y-4">
-                <Label className="text-lg">Product Images</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-green-500"
-                    onClick={handleImageUpload}
-                  >
-                    <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500">Add Photo</p>
-                  </div>
-                  {/* Image previews will be added here */}
-                </div>
-              </div>
-
-              {/* Location */}
-              <div className="space-y-4">
-                <Label htmlFor="location" className="text-lg">
-                  Location
-                </Label>
+              {/* Product Name */}
+              <div className="space-y-2">
+                <Label htmlFor="name">Product Name</Label>
                 <Input
-                  id="location"
-                  placeholder="Enter your location"
-                  className="text-lg py-6"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
 
-              {/* Contact Information */}
-              <div className="space-y-4">
-                <Label htmlFor="phone" className="text-lg">
-                  Contact Number
-                </Label>
-                <Input
-                  id="phone"
-                  placeholder="Enter your phone number"
-                  className="text-lg py-6"
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-end">
+              {/* Price */}
+              <div className="space-y-2">
+                <Label htmlFor="price">Price (₵)</Label>
+                <Input
+                  id="price"
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              {/* Category */}
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  required
+                >
+                  <option value="vegetables">Vegetables</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="grains">Grains</option>
+                  <option value="tubers">Tubers</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* Quantity */}
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="1"
+                  value={formData.quantity}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              {/* Unit */}
+              <div className="space-y-2">
+                <Label htmlFor="unit">Unit</Label>
+                <select
+                  id="unit"
+                  name="unit"
+                  value={formData.unit}
+                  onChange={handleInputChange}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  required
+                >
+                  <option value="kg">Kilogram (kg)</option>
+                  <option value="g">Gram (g)</option>
+                  <option value="piece">Piece</option>
+                  <option value="bundle">Bundle</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                >
+                  Cancel
+                </Button>
                 <Button
                   type="submit"
-                  className="bg-green-600 hover:bg-green-700 text-lg py-6 px-8"
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={loading}
                 >
-                  <Upload className="mr-2 h-5 w-5" />
-                  List Product
+                  {loading ? "Creating..." : "Create Product"}
                 </Button>
               </div>
             </form>

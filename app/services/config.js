@@ -21,16 +21,24 @@ apiClient.interceptors.request.use((config) => {
 
   // Get access token from localStorage
   const token = localStorage.getItem("token");
+  console.log("Token from localStorage:", token); // Debug log
+
   // Attach token to authorization header if it exists
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log("Authorization header set:", config.headers.Authorization); // Debug log
+  } else {
+    console.warn("No token found in localStorage"); // Debug log
   }
   return config;
 });
 
 // Add response interceptor for error handling
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("API Response:", response); // Debug log
+    return response;
+  },
   (error) => {
     // Enhanced error logging
     if (error.response) {

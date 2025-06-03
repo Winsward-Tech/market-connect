@@ -65,12 +65,43 @@ export default function LoginPage() {
         pin: pin,
       });
 
-      // Store the token if it's in the response
-      if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
-      }
+      console.log("Login Response:", response); // Debug log
 
-      router.push("/select-language");
+      // Store the token if it's in the response
+      if (response?.data?.data?.token) {
+        const token = response.data.data.token;
+        console.log("Token received:", token); // Debug log
+        localStorage.setItem("token", token);
+        console.log("Token stored in localStorage"); // Debug log
+
+        // Store user data directly from login response
+        if (response?.data?.data?.user) {
+          const userData = response.data.data.user;
+          console.log("User Data:", userData); // Debug log
+          localStorage.setItem("user", JSON.stringify(userData));
+
+          // Store the user ID - using id instead of _id
+          const userId = userData.id;
+          if (userId) {
+            localStorage.setItem("userId", userId);
+            console.log("Stored userId:", userId); // Debug log
+          } else {
+            console.error("No id found in user data:", userData); // Debug log
+            setError("Login failed. Invalid user data received.");
+            return;
+          }
+        } else {
+          console.error("No user data in response:", response); // Debug log
+          setError("Login failed. No user data received.");
+          return;
+        }
+
+        router.push("/select-language");
+      } else {
+        console.error("No token in response:", response); // Debug log
+        setError("Login failed. No token received.");
+        return;
+      }
     } catch (err) {
       setError(err.message || "Login failed. Please check your credentials.");
     } finally {

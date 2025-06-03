@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { apiRegister } from "@/app/services/auth";
+import { apiRegister, sendOTP } from "@/app/services/auth";
 
 const ROLES = [
   { value: "market_woman", label: "Market Woman" },
@@ -111,19 +111,23 @@ export default function RegisterPage() {
       // Format the phone number for the API
       const formattedPhone = formatPhoneNumber(phoneNumber);
 
+      // Register the user
       const response = await apiRegister({
         name: fullName,
-        phone: formattedPhone, // Use the formatted phone number
+        phone: formattedPhone,
         pin: pin,
         role: role,
         location: location,
         preferredLanguage: preferredLanguage,
       });
 
-      // Use the original phone number for the OTP verification URL
+      // Send OTP after successful registration
+      await sendOTP(formattedPhone);
+
+      // Redirect to OTP verification page
       router.push(
         "/auth/verify-otp?phone=" +
-          encodeURIComponent(phoneNumber) +
+          encodeURIComponent(formattedPhone) +
           "&purpose=register"
       );
     } catch (err) {
