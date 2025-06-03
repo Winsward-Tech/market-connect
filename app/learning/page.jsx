@@ -72,12 +72,9 @@ const LearningPlatform = () => {
     {
       id: "financial-literacy",
       title: "Financial Literacy",
-      titleTwi: "Sika Ho Nimdeɛ",
       icon: "💰",
       color: "bg-emerald-500",
       description: "Learn to manage money, save, and grow your business",
-      descriptionTwi:
-        "Sua sɛdeɛ wobɛhwɛ sika so, wobɛkora, na wobɛma w'adwuma akɛse",
       lessons: 8,
       duration: "2 hours",
       level: "Beginner",
@@ -85,23 +82,29 @@ const LearningPlatform = () => {
     {
       id: "digital-marketing",
       title: "Digital Marketing",
-      titleTwi: "Intanɛt So Adwuma",
       icon: "📱",
       color: "bg-blue-500",
       description: "Use phones and internet to sell your products",
-      descriptionTwi: "Fa phone ne intanɛt di dwuma tɔn w'adeɛ",
       lessons: 6,
-      duration: "1.5 hours",
+      duration: "2hrs 20mins",
+      level: "Beginner",
+    },
+    {
+      id: "farming-practices",
+      title: "Farming Practices",
+      icon: "🌱",
+      color: "bg-green-500",
+      description: "Learn sustainable farming techniques to improve your yield",
+      lessons: 6,
+      duration: "1 hour",
       level: "Beginner",
     },
     {
       id: "health-practices",
       title: "Health Practices",
-      titleTwi: "Apɔmuden Ho Nhyehyɛeɛ",
       icon: "🏥",
       color: "bg-red-500",
       description: "Stay healthy while working at the market",
-      descriptionTwi: "Kɔ so te apɔmuden mu wɔ gua so",
       lessons: 5,
       duration: "1 hour",
       level: "Beginner",
@@ -113,57 +116,166 @@ const LearningPlatform = () => {
       {
         id: 1,
         title: "Understanding Money",
-        titleTwi: "Sika Nteaseɛ",
         duration: "15 min",
         completed: true,
       },
       {
         id: 2,
         title: "Saving Basics",
-        titleTwi: "Sika Kora Mfiase",
         duration: "12 min",
         completed: true,
       },
       {
         id: 3,
         title: "Business Records",
-        titleTwi: "Adwuma Nhoma",
         duration: "18 min",
         completed: true,
       },
       {
         id: 4,
         title: "Pricing Your Products",
-        titleTwi: "W'adeɛ Bo Fa",
         duration: "20 min",
         completed: false,
       },
       {
         id: 5,
         title: "Customer Service",
-        titleTwi: "Adetɔfoɔ Som",
         duration: "16 min",
         completed: false,
       },
       {
         id: 6,
         title: "Profit Calculation",
-        titleTwi: "Mfasoɔ Bu",
         duration: "14 min",
         completed: false,
       },
       {
         id: 7,
         title: "Investment Planning",
-        titleTwi: "Sika De Hyɛ",
         duration: "22 min",
         completed: false,
       },
       {
         id: 8,
         title: "Financial Goals",
-        titleTwi: "Sika Botaeɛ",
         duration: "10 min",
+        completed: false,
+      },
+    ],
+    "digital-marketing": [
+      {
+        id: 1,
+        title: "Digital Marketing Basics",
+        duration: "30 min",
+        videoUrl: "https://www.youtube.com/watch?v=bixR-KIJKYM",
+        completed: true,
+      },
+      {
+        id: 2,
+        title: "Social Media Marketing",
+        duration: "25 min",
+        completed: false,
+      },
+      {
+        id: 3,
+        title: "Mobile Marketing",
+        duration: "20 min",
+        completed: false,
+      },
+      {
+        id: 4,
+        title: "Content Creation",
+        duration: "25 min",
+        completed: false,
+      },
+      {
+        id: 5,
+        title: "Customer Engagement",
+        duration: "20 min",
+        completed: false,
+      },
+      {
+        id: 6,
+        title: "Analytics & Growth",
+        duration: "20 min",
+        completed: false,
+      },
+    ],
+    "farming-practices": [
+      {
+        id: 1,
+        title: "Sustainable Farming Practices",
+        duration: "10 min",
+        completed: false,
+        videoUrl: "https://www.youtube.com/watch?v=iloAQmroRK0",
+      },
+      {
+        id: 2,
+        title: "Crop Rotation Basics",
+        duration: "10 min",
+        completed: false,
+      },
+      {
+        id: 3,
+        title: "Pest Management",
+        duration: "10 min",
+        completed: false,
+      },
+      {
+        id: 4,
+        title: "Water Conservation",
+        duration: "10 min",
+        completed: false,
+      },
+      {
+        id: 5,
+        title: "Organic Fertilizers",
+        duration: "10 min",
+        completed: false,
+      },
+      {
+        id: 6,
+        title: "Post-Harvest Handling",
+        duration: "10 min",
+        completed: false,
+      },
+    ],
+    "health-practices": [
+      {
+        id: 1,
+        title: "Workplace Safety",
+        duration: "20 min",
+        completed: false,
+        videoUrl: "https://www.youtube.com/watch?v=LiPNy_WyCTU",
+      },
+      {
+        id: 2,
+        title: "Nutrition Basics",
+        duration: "15 min",
+        completed: false,
+      },
+      {
+        id: 3,
+        title: "Heat Stress Prevention",
+        duration: "10 min",
+        completed: false,
+      },
+      {
+        id: 4,
+        title: "First Aid Essentials",
+        duration: "30 min",
+        completed: false,
+      },
+      {
+        id: 5,
+        title: "Mental Health Awareness",
+        duration: "20 min",
+        completed: false,
+      },
+      {
+        id: 6,
+        title: "Safe Food Handling",
+        duration: "15 min",
         completed: false,
       },
     ],
@@ -172,22 +284,19 @@ const LearningPlatform = () => {
   const achievements = [
     {
       title: "First Course Started",
-      titleTwi: "Adesua Firii Aseɛ",
       icon: "🌱",
       earned: true,
     },
     {
       title: "7 Day Streak",
-      titleTwi: "Nnafua 7 Toɔ So",
       icon: "🔥",
       earned: true,
     },
-    { title: "Scholar", titleTwi: "Osuani", icon: "🎓", earned: true },
-    { title: "Early Bird", titleTwi: "Anɔpa Kanea", icon: "🌅", earned: false },
-    { title: "Night Owl", titleTwi: "Anadwo Sua", icon: "🦉", earned: false },
+    { title: "Scholar", icon: "🎓", earned: true },
+    { title: "Early Bird", icon: "🌅", earned: false },
+    { title: "Night Owl", icon: "🦉", earned: false },
     {
       title: "Course Completed",
-      titleTwi: "Adesua Wieɛ",
       icon: "🏆",
       earned: false,
     },
@@ -389,14 +498,9 @@ const LearningPlatform = () => {
               className="text-2xl font-bold text-gray-800"
               onClick={() => handleSpeak("Welcome back! Ready to learn today?")}
             >
-              Akwaaba! Welcome Back
+              Welcome Back
             </h1>
-            <p
-              className="text-gray-600"
-              onClick={() => handleSpeak("Wobɛkɔ so asua ɛnnɛ?", "tw")}
-            >
-              Wobɛkɔ so asua ɛnnɛ? • Ready to learn today?
-            </p>
+            <p className="text-gray-600">Ready to learn today?</p>
           </div>
           <div className="flex items-center space-x-4">
             <button
@@ -434,7 +538,7 @@ const LearningPlatform = () => {
             className="text-xl font-semibold"
             onClick={() => handleSpeak("Course Content", currentLanguage)}
           >
-            Course Content • Adesua Mu Nsɛm
+            Course Content
           </h2>
         </div>
 
@@ -473,12 +577,6 @@ const LearningPlatform = () => {
               >
                 {selectedLesson?.title}
               </h2>
-              <h3
-                className="text-lg text-gray-600 mb-6"
-                onClick={() => handleSpeak(selectedLesson?.titleTwi, "tw")}
-              >
-                {selectedLesson?.titleTwi}
-              </h3>
 
               {/* Add visual aids for key points */}
               <div className="bg-blue-50 p-6 rounded-xl mb-6">
@@ -489,7 +587,7 @@ const LearningPlatform = () => {
                   }
                 >
                   <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
-                  Key Learning Points • Nea Wobɛsua
+                  Key Learning Points
                 </h4>
                 <ul className="space-y-2">
                   {[
@@ -521,7 +619,7 @@ const LearningPlatform = () => {
                     // ... existing completion logic ...
                   }}
                 >
-                  Complete Lesson • Wie Adesua
+                  Complete Lesson
                 </button>
                 <button
                   className="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50"
@@ -603,11 +701,27 @@ const LearningPlatform = () => {
           <TabsContent value="business">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <LearningCard
+                title="Digital Marketing Basics"
+                description="How to promote your business using mobile phones and social media"
+                type="video"
+                level="Beginner"
+                duration="2hrs 20mins"
+                onStartLearning={() => {
+                  const digitalCourse = courses.find(
+                    (course) => course.id === "digital-marketing"
+                  );
+                  if (digitalCourse) {
+                    setSelectedCourse(digitalCourse);
+                    setCurrentView("course");
+                  }
+                }}
+              />
+              <LearningCard
                 title="Financial Literacy Basics"
                 description="Learn how to manage your money, save, and plan for your business"
                 type="video"
                 level="Beginner"
-                duration="20 min"
+                duration="1hr 45mins"
                 onStartLearning={() => {
                   const financialCourse = courses.find(
                     (course) => course.id === "financial-literacy"
@@ -623,45 +737,13 @@ const LearningPlatform = () => {
                 description="How to set the right prices for your goods to maximize profit"
                 type="audio"
                 level="Beginner"
-                duration="15 min"
+                duration="1hr 25mins"
                 onStartLearning={() => {
                   const financialCourse = courses.find(
                     (course) => course.id === "financial-literacy"
                   );
                   if (financialCourse) {
                     setSelectedCourse(financialCourse);
-                    setCurrentView("course");
-                  }
-                }}
-              />
-              <LearningCard
-                title="Record Keeping"
-                description="Simple methods to track your sales, expenses, and inventory"
-                type="guide"
-                level="Intermediate"
-                duration="25 min"
-                onStartLearning={() => {
-                  const financialCourse = courses.find(
-                    (course) => course.id === "financial-literacy"
-                  );
-                  if (financialCourse) {
-                    setSelectedCourse(financialCourse);
-                    setCurrentView("course");
-                  }
-                }}
-              />
-              <LearningCard
-                title="Digital Marketing Basics"
-                description="How to promote your business using mobile phones and social media"
-                type="video"
-                level="Beginner"
-                duration="30 min"
-                onStartLearning={() => {
-                  const digitalCourse = courses.find(
-                    (course) => course.id === "digital-marketing"
-                  );
-                  if (digitalCourse) {
-                    setSelectedCourse(digitalCourse);
                     setCurrentView("course");
                   }
                 }}
@@ -671,7 +753,7 @@ const LearningPlatform = () => {
                 description="Strategies to find new customers and enter new markets"
                 type="guide"
                 level="Intermediate"
-                duration="20 min"
+                duration="1hr 10mins"
                 onStartLearning={() => {
                   const digitalCourse = courses.find(
                     (course) => course.id === "digital-marketing"
@@ -687,7 +769,23 @@ const LearningPlatform = () => {
                 description="How to use mobile money services safely for your business"
                 type="video"
                 level="Beginner"
-                duration="15 min"
+                duration="1hr 5mins"
+                onStartLearning={() => {
+                  const financialCourse = courses.find(
+                    (course) => course.id === "financial-literacy"
+                  );
+                  if (financialCourse) {
+                    setSelectedCourse(financialCourse);
+                    setCurrentView("course");
+                  }
+                }}
+              />
+              <LearningCard
+                title="Record Keeping"
+                description="Simple methods to track your sales, expenses, and inventory"
+                type="guide"
+                level="Intermediate"
+                duration="1hr 25 mins"
                 onStartLearning={() => {
                   const financialCourse = courses.find(
                     (course) => course.id === "financial-literacy"
@@ -708,10 +806,10 @@ const LearningPlatform = () => {
                 description="Learn eco-friendly farming techniques that improve yield"
                 type="video"
                 level="Beginner"
-                duration="25 min"
+                duration="1hr"
                 onStartLearning={() => {
                   const farmingCourse = courses.find(
-                    (course) => course.id === "health-practices"
+                    (course) => course.id === "farming-practices"
                   );
                   if (farmingCourse) {
                     setSelectedCourse(farmingCourse);
@@ -724,10 +822,10 @@ const LearningPlatform = () => {
                 description="How to plan crop rotation to maintain soil health"
                 type="guide"
                 level="Intermediate"
-                duration="20 min"
+                duration="45mins"
                 onStartLearning={() => {
                   const farmingCourse = courses.find(
-                    (course) => course.id === "health-practices"
+                    (course) => course.id === "farming-practices"
                   );
                   if (farmingCourse) {
                     setSelectedCourse(farmingCourse);
@@ -740,10 +838,10 @@ const LearningPlatform = () => {
                 description="Natural methods to control pests and protect your crops"
                 type="video"
                 level="Beginner"
-                duration="30 min"
+                duration="1hr 10mins"
                 onStartLearning={() => {
                   const farmingCourse = courses.find(
-                    (course) => course.id === "health-practices"
+                    (course) => course.id === "farming-practices"
                   );
                   if (farmingCourse) {
                     setSelectedCourse(farmingCourse);
@@ -756,26 +854,10 @@ const LearningPlatform = () => {
                 description="Techniques to reduce water usage while maintaining crop health"
                 type="audio"
                 level="Beginner"
-                duration="15 min"
+                duration="55mins"
                 onStartLearning={() => {
                   const farmingCourse = courses.find(
-                    (course) => course.id === "health-practices"
-                  );
-                  if (farmingCourse) {
-                    setSelectedCourse(farmingCourse);
-                    setCurrentView("course");
-                  }
-                }}
-              />
-              <LearningCard
-                title="Post-Harvest Handling"
-                description="How to store and preserve your harvest to reduce losses"
-                type="guide"
-                level="Intermediate"
-                duration="25 min"
-                onStartLearning={() => {
-                  const farmingCourse = courses.find(
-                    (course) => course.id === "health-practices"
+                    (course) => course.id === "farming-practices"
                   );
                   if (farmingCourse) {
                     setSelectedCourse(farmingCourse);
@@ -788,10 +870,26 @@ const LearningPlatform = () => {
                 description="How to make and use organic fertilizers for better crops"
                 type="video"
                 level="Beginner"
-                duration="20 min"
+                duration="1hr 25mins"
                 onStartLearning={() => {
                   const farmingCourse = courses.find(
-                    (course) => course.id === "health-practices"
+                    (course) => course.id === "farming-practices"
+                  );
+                  if (farmingCourse) {
+                    setSelectedCourse(farmingCourse);
+                    setCurrentView("course");
+                  }
+                }}
+              />
+              <LearningCard
+                title="Post-Harvest Handling"
+                description="How to store and preserve your harvest to reduce losses"
+                type="guide"
+                level="Intermediate"
+                duration="1hr 5mins"
+                onStartLearning={() => {
+                  const farmingCourse = courses.find(
+                    (course) => course.id === "farming-practices"
                   );
                   if (farmingCourse) {
                     setSelectedCourse(farmingCourse);
@@ -809,7 +907,7 @@ const LearningPlatform = () => {
                 description="How to stay safe and healthy while working at the market or farm"
                 type="video"
                 level="Beginner"
-                duration="20 min"
+                duration="1hr 20mins"
                 onStartLearning={() => {
                   const healthCourse = courses.find(
                     (course) => course.id === "health-practices"
@@ -825,7 +923,7 @@ const LearningPlatform = () => {
                 description="Understanding balanced diets and healthy eating habits"
                 type="guide"
                 level="Beginner"
-                duration="15 min"
+                duration="1hr 15mins"
                 onStartLearning={() => {
                   const healthCourse = courses.find(
                     (course) => course.id === "health-practices"
@@ -841,7 +939,7 @@ const LearningPlatform = () => {
                 description="How to protect yourself from heat-related illnesses while working"
                 type="audio"
                 level="Beginner"
-                duration="10 min"
+                duration="1hr 10mins"
                 onStartLearning={() => {
                   const healthCourse = courses.find(
                     (course) => course.id === "health-practices"
@@ -857,7 +955,7 @@ const LearningPlatform = () => {
                 description="Basic first aid skills for common injuries at work"
                 type="video"
                 level="Intermediate"
-                duration="30 min"
+                duration="1hr 10mins"
                 onStartLearning={() => {
                   const healthCourse = courses.find(
                     (course) => course.id === "health-practices"
@@ -873,7 +971,7 @@ const LearningPlatform = () => {
                 description="Understanding stress and maintaining mental wellbeing"
                 type="guide"
                 level="Beginner"
-                duration="20 min"
+                duration="1hr 5mins"
                 onStartLearning={() => {
                   const healthCourse = courses.find(
                     (course) => course.id === "health-practices"
@@ -889,7 +987,7 @@ const LearningPlatform = () => {
                 description="Proper techniques for handling and storing food products"
                 type="video"
                 level="Beginner"
-                duration="15 min"
+                duration="45mins"
                 onStartLearning={() => {
                   const healthCourse = courses.find(
                     (course) => course.id === "health-practices"
@@ -931,27 +1029,45 @@ const LearningPlatform = () => {
                   <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-2">Financial Success</h3>
+              <h3 className="text-xl font-bold mb-2">Business Success</h3>
               <p className="text-gray-600 mb-4">
-                Learn how to manage money, price products, and grow your
-                business
+                Learn how to grow your business through digital marketing,
+                financial management, and market expansion
               </p>
               <div className="space-y-2">
                 <div className="flex items-center">
                   <div className="w-6 h-6 rounded-full bg-green-600 text-white flex items-center justify-center mr-2 text-xs">
                     1
                   </div>
-                  <span>Financial Literacy Basics</span>
+                  <span>Digital Marketing Basics</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-6 h-6 rounded-full bg-green-200 text-green-800 flex items-center justify-center mr-2 text-xs">
                     2
                   </div>
-                  <span>Pricing Your Products</span>
+                  <span>Financial Literacy Basics</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-6 h-6 rounded-full bg-green-200 text-green-800 flex items-center justify-center mr-2 text-xs">
                     3
+                  </div>
+                  <span>Pricing Your Products</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-green-200 text-green-800 flex items-center justify-center mr-2 text-xs">
+                    4
+                  </div>
+                  <span>Expanding Your Market</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-green-200 text-green-800 flex items-center justify-center mr-2 text-xs">
+                    5
+                  </div>
+                  <span>Mobile Money for Business</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-green-200 text-green-800 flex items-center justify-center mr-2 text-xs">
+                    6
                   </div>
                   <span>Record Keeping</span>
                 </div>
@@ -990,11 +1106,29 @@ const LearningPlatform = () => {
                   <div className="w-6 h-6 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center mr-2 text-xs">
                     2
                   </div>
-                  <span>Pest Management</span>
+                  <span>Crop Rotation Basics</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-6 h-6 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center mr-2 text-xs">
                     3
+                  </div>
+                  <span>Pest Management</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center mr-2 text-xs">
+                    4
+                  </div>
+                  <span>Water Conservation</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center mr-2 text-xs">
+                    5
+                  </div>
+                  <span>Organic Fertilizers</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center mr-2 text-xs">
+                    6
                   </div>
                   <span>Post-Harvest Handling</span>
                 </div>
@@ -1027,19 +1161,37 @@ const LearningPlatform = () => {
                   <div className="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center mr-2 text-xs">
                     1
                   </div>
-                  <span>Workplace Safety</span>
+                  <span>Workplace Safety (1hr 20mins)</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-6 h-6 rounded-full bg-red-200 text-red-800 flex items-center justify-center mr-2 text-xs">
                     2
                   </div>
-                  <span>Nutrition Basics</span>
+                  <span>Nutrition Basics (1hr 15mins)</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-6 h-6 rounded-full bg-red-200 text-red-800 flex items-center justify-center mr-2 text-xs">
                     3
                   </div>
-                  <span>First Aid Essentials</span>
+                  <span>Heat Stress Prevention (1hr 10mins)</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-red-200 text-red-800 flex items-center justify-center mr-2 text-xs">
+                    4
+                  </div>
+                  <span>First Aid Essentials (1hr 10mins)</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-red-200 text-red-800 flex items-center justify-center mr-2 text-xs">
+                    5
+                  </div>
+                  <span>Mental Health Awareness (1hr 5mins)</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-red-200 text-red-800 flex items-center justify-center mr-2 text-xs">
+                    6
+                  </div>
+                  <span>Safe Food Handling (45mins)</span>
                 </div>
               </div>
             </div>
@@ -1097,29 +1249,84 @@ function LearningCard({
     }
   };
 
+  const getCardImage = () => {
+    switch (title) {
+      case "Financial Literacy Basics":
+        return "/images/financial.png";
+      case "Pricing Your Products":
+        return "/images/Pricing.png";
+      case "Record Keeping":
+        return "/images/record.jpg";
+      case "Digital Marketing Basics":
+        return "/images/digital.jpg";
+      case "Expanding Your Market":
+        return "/images/market.jpg";
+      case "Mobile Money for Business":
+        return "/images/momo.jpg";
+      case "Sustainable Farming Practices":
+        return "/images/sustainable.jpg";
+      case "Crop Rotation Basics":
+        return "/images/rotation.webp";
+      case "Pest Management":
+        return "/images/pest.jpg";
+      case "Water Conservation":
+        return "/images/water.jpg";
+      case "Post-Harvest Handling":
+        return "/images/Post-harvest.jpeg";
+      case "Organic Fertilizers":
+        return "/images/Fertilizer.webp";
+      case "Workplace Safety":
+        return "/images/Safety.jpg";
+      case "Nutrition Basics":
+        return "/images/nutrition.jpg";
+      case "Heat Stress Prevention":
+        return "/images/Heat.jpg";
+      case "First Aid Essentials":
+        return "/images/first-aid.jpg";
+      case "Mental Health Awareness":
+        return "/images/mental-health.jpg";
+      case "Safe Food Handling":
+        return "/images/Safe-food.jpg";
+      default:
+        return null;
+    }
+  };
+
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg group">
-      <div
-        className={`h-40 bg-gradient-to-r ${getTypeBackground()} flex items-center justify-center relative`}
-      >
-        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-all"></div>
-        <div className="bg-white rounded-full p-4 shadow-md">
-          {getTypeIcon()}
-        </div>
-        {type === "video" && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-14 h-14 rounded-full bg-white/80 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-8 h-8 text-red-500 ml-1"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
+    <Card className="group cursor-pointer hover:shadow-lg transition-all">
+      <div className="h-40 relative">
+        {getCardImage() ? (
+          <div className="w-full h-full overflow-hidden">
+            <img
+              src={getCardImage()}
+              alt={title}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        ) : (
+          <div
+            className={`h-full bg-gradient-to-r ${getTypeBackground()} flex items-center justify-center relative`}
+          >
+            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-all"></div>
+            <div className="bg-white rounded-full p-4 shadow-md">
+              {getTypeIcon()}
             </div>
+            {type === "video" && (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="w-14 h-14 rounded-full bg-white/80 flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-8 h-8 text-red-500 ml-1"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

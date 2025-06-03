@@ -1,18 +1,25 @@
 import React from "react";
 import { ArrowLeft, BookOpen, ArrowRight, Check, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const CourseView = ({ course, progress, lessons, onBack, onLessonSelect }) => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mb-6">
-        <button
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{course.title}</h1>
+        </div>
+        <Button
+          variant="outline"
           onClick={onBack}
-          className="flex items-center text-gray-600 hover:text-gray-800 mb-4"
+          className="flex items-center gap-2"
         >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Dashboard • San kɔ Dashboard
-        </button>
+          <ArrowLeft className="w-4 h-4" />
+          Back to Courses
+        </Button>
+      </div>
 
+      <div className="mb-6">
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-start space-x-4 mb-6">
             <div
@@ -22,7 +29,6 @@ const CourseView = ({ course, progress, lessons, onBack, onLessonSelect }) => {
             </div>
             <div className="flex-1">
               <h1 className="text-2xl font-bold mb-2">{course.title}</h1>
-              <p className="text-lg text-gray-600 mb-2">{course.titleTwi}</p>
               <p className="text-gray-600 mb-4">{course.description}</p>
 
               <div className="flex items-center space-x-6 text-sm text-gray-500">
@@ -40,7 +46,7 @@ const CourseView = ({ course, progress, lessons, onBack, onLessonSelect }) => {
 
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Progress • Nkɔsoɔ</span>
+              <span className="text-sm font-medium">Progress</span>
               <span className="text-sm font-medium">
                 {progress?.progress || 0}%
               </span>
@@ -57,9 +63,7 @@ const CourseView = ({ course, progress, lessons, onBack, onLessonSelect }) => {
 
       <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6 border-b">
-          <h2 className="text-xl font-semibold">
-            Course Content • Adesua Mu Nsɛm
-          </h2>
+          <h2 className="text-xl font-semibold">Course Content</h2>
         </div>
 
         <div className="divide-y">
@@ -85,7 +89,6 @@ const CourseView = ({ course, progress, lessons, onBack, onLessonSelect }) => {
                 </div>
                 <div>
                   <h3 className="font-medium">{lesson.title}</h3>
-                  <p className="text-sm text-gray-600">{lesson.titleTwi}</p>
                   <p className="text-sm text-gray-500">{lesson.duration}</p>
                 </div>
               </div>

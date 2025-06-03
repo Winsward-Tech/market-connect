@@ -1,7 +1,6 @@
 import React from "react";
 import { BookOpen, Check } from "lucide-react";
 import CourseCard from "./CourseCard";
-import StreakCard from "./StreakCard";
 import ProgressOverview from "./ProgressOverview";
 import AchievementsList from "./AchievementsList";
 
@@ -32,7 +31,6 @@ const Dashboard = ({
           </div>
         </div>
 
-        <StreakCard streakData={streakData} />
         <ProgressOverview />
       </div>
 

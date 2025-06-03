@@ -5,7 +5,7 @@ import { BottomNav } from "@/components/bottom-nav";
 
 export function ClientWrapper({ children }) {
   const pathname = usePathname();
-  const shouldShowNav = pathname === "/home";
+  const shouldShowNav = pathname === "/home" || pathname === "/community";
 
   return (
     <>
