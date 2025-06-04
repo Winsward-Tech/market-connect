@@ -90,13 +90,18 @@ export default function LoginPage() {
             setError("Login failed. Invalid user data received.");
             return;
           }
+
+          // Check if user is an admin and redirect accordingly
+          if (userData.role === "admin") {
+            router.push("/admin/dashboard");
+          } else {
+            router.push("/select-language");
+          }
         } else {
           console.error("No user data in response:", response); // Debug log
           setError("Login failed. No user data received.");
           return;
         }
-
-        router.push("/select-language");
       } else {
         console.error("No token in response:", response); // Debug log
         setError("Login failed. No token received.");

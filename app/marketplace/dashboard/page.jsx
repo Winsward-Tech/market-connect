@@ -15,30 +15,70 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getProductsByUser, deleteProduct } from "@/app/services/advert";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("products");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
-  // Mock data - replace with your API data later
-  const myProducts = [
-    {
-      id: 1,
-      title: "Fresh Tomatoes",
-      price: "GH₵ 15 per kg",
-      status: "Active",
-      views: 245,
-      inquiries: 12,
-    },
-    {
-      id: 2,
-      title: "Organic Plantains",
-      price: "GH₵ 20 per bunch",
-      status: "Active",
-      views: 189,
-      inquiries: 8,
-    },
-  ];
+  useEffect(() => {
+    const fetchUserProducts = async () => {
+      try {
+        setLoading(true);
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          router.push("/auth/login");
+          return;
+        }
+
+        const response = await getProductsByUser(userId);
+        if (response?.data?.data?.products) {
+          setProducts(response.data.data.products);
+        } else {
+          setProducts([]);
+        }
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Failed to load products");
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProducts();
+  }, [router]);
+
+  const handleDeleteProduct = async (id) => {
+    try {
+      await deleteProduct(id);
+      setProducts(products.filter((product) => product.id !== id));
+      toast.success("Product deleted successfully");
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      toast.error("Failed to delete product");
+    }
+  };
+
+  const stats = {
+    activeProducts: products.length,
+    totalViews: products.reduce(
+      (sum, product) => sum + (product.views || 0),
+      0
+    ),
+    inquiries: products.reduce(
+      (sum, product) => sum + (product.inquiries || 0),
+      0
+    ),
+    successRate: products.length > 0 ? "85%" : "0%",
+  };
 
   return (
     <div className="min-h-screen bg-green-50">
@@ -66,7 +106,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Active Products</p>
-                  <h3 className="text-2xl font-bold">2</h3>
+                  <h3 className="text-2xl font-bold">{stats.activeProducts}</h3>
                 </div>
                 <ShoppingBag className="h-8 w-8 text-green-600" />
               </div>
@@ -77,7 +117,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Total Views</p>
-                  <h3 className="text-2xl font-bold">434</h3>
+                  <h3 className="text-2xl font-bold">{stats.totalViews}</h3>
                 </div>
                 <Eye className="h-8 w-8 text-blue-600" />
               </div>
@@ -88,7 +128,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Inquiries</p>
-                  <h3 className="text-2xl font-bold">20</h3>
+                  <h3 className="text-2xl font-bold">{stats.inquiries}</h3>
                 </div>
                 <MessageSquare className="h-8 w-8 text-purple-600" />
               </div>
@@ -99,7 +139,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Success Rate</p>
-                  <h3 className="text-2xl font-bold">85%</h3>
+                  <h3 className="text-2xl font-bold">{stats.successRate}</h3>
                 </div>
                 <BarChart className="h-8 w-8 text-orange-600" />
               </div>
@@ -149,50 +189,85 @@ export default function DashboardPage() {
                   </Link>
                 </div>
 
-                <div className="space-y-4">
-                  {myProducts.map((product) => (
-                    <Card key={product.id}>
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-xl font-bold mb-1">
-                              {product.title}
-                            </h3>
-                            <p className="text-green-600 font-bold">
-                              {product.price}
-                            </p>
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading products...</p>
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-8">
+                    <p className="text-red-500">{error}</p>
+                    <Button
+                      className="mt-4 bg-green-600 hover:bg-green-700"
+                      onClick={() => window.location.reload()}
+                    >
+                      Try Again
+                    </Button>
+                  </div>
+                ) : products.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">No products found</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {products.map((product) => (
+                      <Card key={product.id}>
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-xl font-bold mb-1">
+                                {product.title}
+                              </h3>
+                              <p className="text-green-600 font-bold">
+                                GH₵ {product.price} per {product.unit}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <div className="text-center">
+                                <p className="text-sm text-gray-500">Views</p>
+                                <p className="font-bold">
+                                  {product.views || 0}
+                                </p>
+                              </div>
+                              <div className="text-center">
+                                <p className="text-sm text-gray-500">
+                                  Inquiries
+                                </p>
+                                <p className="font-bold">
+                                  {product.inquiries || 0}
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="text-blue-600"
+                                  onClick={() =>
+                                    router.push(
+                                      `/marketplace/dashboard/edit-product/${product.id}`
+                                    )
+                                  }
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="text-red-600"
+                                  onClick={() =>
+                                    handleDeleteProduct(product.id)
+                                  }
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-center">
-                              <p className="text-sm text-gray-500">Views</p>
-                              <p className="font-bold">{product.views}</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-sm text-gray-500">Inquiries</p>
-                              <p className="font-bold">{product.inquiries}</p>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="text-blue-600"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="text-red-600"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="inquiries" className="mt-0">

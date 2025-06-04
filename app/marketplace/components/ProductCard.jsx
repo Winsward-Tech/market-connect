@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,6 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Package } from "lucide-react";
 
 export function FeaturedProductCard({ title, price, location, image }) {
   return (
@@ -30,40 +34,54 @@ export function FeaturedProductCard({ title, price, location, image }) {
 
 export function SimpleProductCard({
   title,
-  seller,
-  location,
+  description,
   price,
-  image,
-  phone,
+  quantity,
+  location,
+  category,
+  isAvailable,
 }) {
   return (
-    <Card className="overflow-hidden">
-      <div className="relative h-56">
-        <img src={image} alt={title} className="w-full h-full object-cover" />
-        <div className="absolute top-3 right-3 bg-green-100 text-green-700 px-3 py-2 rounded-full text-base font-medium flex items-center">
-          <CheckCircle className="h-5 w-5 mr-2" />
-          Available
-        </div>
-      </div>
-      <CardContent className="p-5">
-        <h3 className="text-2xl font-bold mb-3">{title}</h3>
-        <p className="text-green-600 font-bold text-xl mb-4">{price}</p>
-        <div className="space-y-3">
-          <div className="flex items-center text-gray-700 text-lg">
-            <MapPin className="h-6 w-6 mr-3 text-green-600" />
-            <span>Location: {location}</span>
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          {/* Header */}
+          <div className="flex justify-between items-start">
+            <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">
+              {title}
+            </h3>
+            <Badge
+              variant={isAvailable ? "default" : "destructive"}
+              className="ml-2"
+            >
+              {isAvailable ? "Available" : "Sold Out"}
+            </Badge>
           </div>
-          <div className="flex items-center text-gray-700 text-lg">
-            <Phone className="h-6 w-6 mr-3 text-green-600" />
-            <span>Call: {phone}</span>
+
+          {/* Description */}
+          <p className="text-gray-600 text-sm line-clamp-2">{description}</p>
+
+          {/* Price and Quantity */}
+          <div className="flex justify-between items-center">
+            <span className="text-2xl font-bold text-green-600">{price}</span>
+            <div className="flex items-center text-gray-600">
+              <Package className="h-4 w-4 mr-1" />
+              <span className="text-sm">{quantity}</span>
+            </div>
+          </div>
+
+          {/* Location and Category */}
+          <div className="flex justify-between items-center text-sm text-gray-500">
+            <div className="flex items-center">
+              <MapPin className="h-4 w-4 mr-1" />
+              <span>{location}</span>
+            </div>
+            <Badge variant="outline" className="capitalize">
+              {category}
+            </Badge>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="p-5 pt-0">
-        <Button className="w-full bg-green-600 hover:bg-green-700 text-lg py-6">
-          Call Seller
-        </Button>
-      </CardFooter>
     </Card>
   );
 }

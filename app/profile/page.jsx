@@ -24,10 +24,14 @@ import {
   Shield,
   LogOut,
   X,
+  Eye,
+  MoreVertical,
+  Trash2,
+  Menu,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getUserById, updateUser } from "../services/auth";
+import { getCurrentUser, updateUser } from "../services/auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -37,6 +41,7 @@ import { toast } from "sonner";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -52,31 +57,16 @@ export default function ProfilePage() {
     const fetchUser = async () => {
       try {
         setLoading(true);
-        // Check if we're in the browser environment
-        if (typeof window === "undefined") {
-          return;
-        }
+        if (typeof window === "undefined") return;
 
         const token = localStorage.getItem("token");
-        const userId = localStorage.getItem("userId");
-
-        console.log("Retrieved userId:", userId); // Debug log
-
         if (!token) {
-          console.error("No token found"); // Debug log
+          console.error("No token found");
           router.push("/auth/login");
           return;
         }
 
-        if (!userId) {
-          console.error("No userId found"); // Debug log
-          router.push("/auth/login");
-          return;
-        }
-
-        const response = await getUserById(userId);
-        console.log("API Response:", response); // Debug log
-
+        const response = await getCurrentUser();
         if (response?.data?.data?.user) {
           setUser(response.data.data.user);
           setError(null);
@@ -87,13 +77,11 @@ export default function ProfilePage() {
               response.data.data.user.preferredLanguage || "en",
           });
         } else {
-          console.error("Invalid response structure:", response); // Debug log
           throw new Error("No user data received");
         }
       } catch (err) {
         console.error("Error fetching user:", err);
         setError(err.message || "Failed to fetch user details");
-        // If unauthorized, redirect to login
         if (err.response?.status === 401) {
           router.push("/auth/login");
         }
@@ -125,10 +113,12 @@ export default function ProfilePage() {
       }
 
       const response = await updateUser(userId, formData);
-      if (response?.data?.data) {
-        setUser(response.data.data);
+      if (response?.data?.data?.user) {
+        setUser(response.data.data.user);
         setIsEditing(false);
         toast.success("Profile updated successfully");
+      } else {
+        throw new Error("Failed to update profile: Invalid response format");
       }
     } catch (err) {
       setError(err.message || "Failed to update profile");
@@ -138,11 +128,26 @@ export default function ProfilePage() {
     }
   };
 
+  const handleNavigation = (tab) => {
+    setActiveTab(tab);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <header className="bg-green-700 text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="text-white p-0 mr-2 md:hidden"
+              onClick={toggleSidebar}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
             <Link href="/">
               <Button variant="ghost" className="text-white p-0 mr-2">
                 <ArrowLeft className="h-5 w-5" />
@@ -173,6 +178,13 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gray-50">
         <header className="bg-green-700 text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="text-white p-0 mr-2 md:hidden"
+              onClick={toggleSidebar}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
             <Link href="/">
               <Button variant="ghost" className="text-white p-0 mr-2">
                 <ArrowLeft className="h-5 w-5" />
@@ -202,6 +214,13 @@ export default function ProfilePage() {
       {/* Header */}
       <header className="bg-green-700 text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            className="text-white p-0 mr-2 md:hidden"
+            onClick={toggleSidebar}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           <Link href="/">
             <Button variant="ghost" className="text-white p-0 mr-2">
               <ArrowLeft className="h-5 w-5" />
@@ -222,73 +241,111 @@ export default function ProfilePage() {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-white h-[calc(100vh-4rem)] sticky top-16 shadow-md hidden md:block">
+        <aside
+          className={`fixed md:static w-64 bg-white h-[calc(100vh-4rem)] top-16 shadow-md transition-transform duration-300 ease-in-out z-40 ${
+            isSidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full md:translate-x-0"
+          }`}
+        >
           <div className="p-4">
             <div className="space-y-1">
-              <Link href="/profile">
-                <Button variant="ghost" className="w-full justify-start gap-2">
-                  <Home className="h-5 w-5" />
-                  Dashboard
-                </Button>
-              </Link>
-              <Link href="/profile/products">
-                <Button variant="ghost" className="w-full justify-start gap-2">
-                  <Store className="h-5 w-5" />
-                  My Products
-                </Button>
-              </Link>
-              <Link href="/profile/orders">
-                <Button variant="ghost" className="w-full justify-start gap-2">
-                  <ShoppingBag className="h-5 w-5" />
-                  Orders
-                </Button>
-              </Link>
-              <Link href="/profile/messages">
-                <Button variant="ghost" className="w-full justify-start gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Messages
-                </Button>
-              </Link>
-              <Link href="/profile/notifications">
-                <Button variant="ghost" className="w-full justify-start gap-2">
-                  <Bell className="h-5 w-5" />
-                  Notifications
-                </Button>
-              </Link>
+              <Button
+                variant={activeTab === "dashboard" ? "secondary" : "ghost"}
+                className="w-full justify-start gap-2"
+                onClick={() => {
+                  handleNavigation("dashboard");
+                  setIsSidebarOpen(false);
+                }}
+              >
+                <Home className="h-5 w-5" />
+                Dashboard
+              </Button>
+              <Button
+                variant={activeTab === "analytics" ? "secondary" : "ghost"}
+                className="w-full justify-start gap-2"
+                onClick={() => {
+                  handleNavigation("analytics");
+                  setIsSidebarOpen(false);
+                }}
+              >
+                <BarChart3 className="h-5 w-5" />
+                Analytics
+              </Button>
+              <Button
+                variant={activeTab === "products" ? "secondary" : "ghost"}
+                className="w-full justify-start gap-2"
+                onClick={() => {
+                  handleNavigation("products");
+                  setIsSidebarOpen(false);
+                }}
+              >
+                <Store className="h-5 w-5" />
+                My Products
+                {user?.unreadMessages > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {user.unreadMessages}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant={activeTab === "messages" ? "secondary" : "ghost"}
+                className="w-full justify-start gap-2"
+                onClick={() => {
+                  handleNavigation("messages");
+                  setIsSidebarOpen(false);
+                }}
+              >
+                <MessageSquare className="h-5 w-5" />
+                Messages
+                {user?.unreadMessages > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {user.unreadMessages}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant={activeTab === "settings" ? "secondary" : "ghost"}
+                className="w-full justify-start gap-2"
+                onClick={() => {
+                  handleNavigation("settings");
+                  setIsSidebarOpen(false);
+                }}
+              >
+                <Settings className="h-5 w-5" />
+                Settings
+              </Button>
             </div>
 
             <div className="mt-8">
               <h3 className="px-4 text-sm font-semibold text-gray-500">
-                Settings
+                Account
               </h3>
               <div className="mt-2 space-y-1">
-                <Link href="/profile/settings">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start gap-2"
-                  >
-                    <Settings className="h-5 w-5" />
-                    Account Settings
-                  </Button>
-                </Link>
-                <Link href="/profile/payments">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start gap-2"
-                  >
-                    <CreditCard className="h-5 w-5" />
-                    Payment Methods
-                  </Button>
-                </Link>
-                <Link href="/profile/privacy">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start gap-2"
-                  >
-                    <Shield className="h-5 w-5" />
-                    Privacy
-                  </Button>
-                </Link>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <User className="h-5 w-5" />
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => handleNavigation("settings")}
+                >
+                  <CreditCard className="h-5 w-5" />
+                  Payment Methods
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2"
+                  onClick={() => handleNavigation("settings")}
+                >
+                  <Shield className="h-5 w-5" />
+                  Privacy
+                </Button>
               </div>
             </div>
 
@@ -309,6 +366,14 @@ export default function ProfilePage() {
           </div>
         </aside>
 
+        {/* Add overlay for mobile */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* Main Content */}
         <main className="flex-1 p-8">
           {/* Profile Card */}
@@ -321,6 +386,7 @@ export default function ProfilePage() {
                 <Button
                   size="icon"
                   className="absolute bottom-0 right-0 bg-green-600 hover:bg-green-700 rounded-full h-10 w-10 shadow-md"
+                  onClick={() => setIsEditing(true)}
                 >
                   <Edit className="h-5 w-5" />
                 </Button>
@@ -383,6 +449,267 @@ export default function ProfilePage() {
               </Button>
             </div>
           </div>
+
+          {/* Add Analytics content */}
+          {activeTab === "analytics" && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold mb-6">Analytics Overview</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sales Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px] flex items-center justify-center text-gray-500">
+                      Sales Chart Placeholder
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Product Views</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px] flex items-center justify-center text-gray-500">
+                      Views Chart Placeholder
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Customer Demographics</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px] flex items-center justify-center text-gray-500">
+                      Demographics Chart Placeholder
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Revenue Trends</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px] flex items-center justify-center text-gray-500">
+                      Revenue Chart Placeholder
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Replace Tabs with conditional rendering based on activeTab */}
+          {activeTab === "dashboard" && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Recent Activity</h2>
+                <Button variant="outline" className="text-green-600">
+                  View All
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {user?.recentActivity?.map((activity, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center p-4 bg-gray-50 rounded-lg"
+                  >
+                    <div
+                      className={`bg-${activity.color}-100 p-2 rounded-full mr-4`}
+                    >
+                      {activity.icon}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{activity.title}</p>
+                      <p className="text-sm text-gray-500">
+                        {activity.description}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{activity.value}</p>
+                      <p className="text-sm text-gray-500">{activity.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "products" && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">My Products</h2>
+                <Link href="/profile/products/add">
+                  <Button className="bg-green-600 hover:bg-green-700">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add New Product
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Product Filters */}
+              <div className="flex gap-4 mb-6">
+                <Button variant="outline" className="text-green-600">
+                  All Products ({user?.totalProducts || 0})
+                </Button>
+                <Button variant="outline">
+                  Active ({user?.activeProducts || 0})
+                </Button>
+                <Button variant="outline">
+                  Sold ({user?.soldProducts || 0})
+                </Button>
+                <Button variant="outline">
+                  Drafts ({user?.draftProducts || 0})
+                </Button>
+              </div>
+
+              {/* Products Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {user?.products?.map((product) => (
+                  <Card key={product.id} className="overflow-hidden">
+                    <div className="relative">
+                      <img
+                        src={product.images?.[0] || "/placeholder.svg"}
+                        alt={product.name}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute top-2 right-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="bg-white/80 hover:bg-white"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium">{product.name}</h3>
+                        <span className="text-sm font-medium text-green-600">
+                          GH₵{product.price}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                        <div className="flex items-center">
+                          <Eye className="h-4 w-4 mr-1" />
+                          {product.views || 0}
+                        </div>
+                        <div className="flex items-center">
+                          <MessageSquare className="h-4 w-4 mr-1" />
+                          {product.inquiries || 0}
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span
+                          className={`text-sm ${
+                            product.status === "active"
+                              ? "text-green-600"
+                              : product.status === "sold"
+                              ? "text-red-600"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {product.status?.charAt(0).toUpperCase() +
+                            product.status?.slice(1)}
+                        </span>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "messages" && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Messages</h2>
+                <Button variant="outline" className="text-green-600">
+                  Mark All as Read
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {user?.messages?.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex items-center p-4 rounded-lg ${
+                      message.unread ? "bg-green-50" : "bg-gray-50"
+                    }`}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gray-200 mr-4"></div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium">{message.sender}</p>
+                          <p className="text-sm text-gray-500">
+                            {message.preview}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-500">
+                            {message.time}
+                          </p>
+                          {message.unread && (
+                            <span className="inline-block w-2 h-2 bg-green-600 rounded-full mt-2"></span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold mb-6">Business Settings</h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium">Business Profile</p>
+                    <p className="text-sm text-gray-500">
+                      Manage your business information
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={() => setIsEditing(true)}>
+                    Edit
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium">Product Preferences</p>
+                    <p className="text-sm text-gray-500">
+                      Configure your product posting settings
+                    </p>
+                  </div>
+                  <Button variant="outline">Configure</Button>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium">Payment Methods</p>
+                    <p className="text-sm text-gray-500">
+                      Manage your payment options
+                    </p>
+                  </div>
+                  <Button variant="outline">Manage</Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Edit Profile Modal */}
           {isEditing && (
@@ -454,252 +781,6 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
-
-          {/* Dashboard Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">Total Sales</p>
-                  <h3 className="text-2xl font-bold">
-                    ₵{user?.totalSales || "0"}
-                  </h3>
-                </div>
-                <div className="bg-green-100 p-3 rounded-full">
-                  <DollarSign className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-green-600">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                <span className="text-sm">
-                  +{user?.salesGrowth || "0"}% from last month
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">Active Products</p>
-                  <h3 className="text-2xl font-bold">
-                    {user?.activeProducts || "0"}
-                  </h3>
-                </div>
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <Package className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-blue-600">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                <span className="text-sm">
-                  +{user?.newProducts || "0"} new this week
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">Total Views</p>
-                  <h3 className="text-2xl font-bold">
-                    {user?.totalViews || "0"}
-                  </h3>
-                </div>
-                <div className="bg-purple-100 p-3 rounded-full">
-                  <Users className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-purple-600">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                <span className="text-sm">
-                  +{user?.viewsGrowth || "0"}% from last week
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">Total Orders</p>
-                  <h3 className="text-2xl font-bold">
-                    {user?.totalOrders || "0"}
-                  </h3>
-                </div>
-                <div className="bg-orange-100 p-3 rounded-full">
-                  <ShoppingBag className="h-6 w-6 text-orange-600" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-orange-600">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                <span className="text-sm">
-                  +{user?.ordersGrowth || "0"}% from last month
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <Tabs defaultValue="dashboard" className="mb-8">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
-              <TabsTrigger value="dashboard" className="text-lg py-3">
-                <BarChart3 className="mr-2 h-4 w-4" />
-                Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="products" className="text-lg py-3">
-                <ShoppingBag className="mr-2 h-4 w-4" />
-                Products
-              </TabsTrigger>
-              <TabsTrigger value="reviews" className="text-lg py-3">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Reviews
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="text-lg py-3">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="dashboard">
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold">Recent Activity</h2>
-                  <Button
-                    variant="outline"
-                    className="text-green-600 border-green-200"
-                  >
-                    View All
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                    <div className="bg-green-100 p-2 rounded-full mr-4">
-                      <DollarSign className="h-5 w-5 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">New Sale</p>
-                      <p className="text-sm text-gray-500">Tomatoes - 5kg</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">₵120</p>
-                      <p className="text-sm text-gray-500">2 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                    <div className="bg-blue-100 p-2 rounded-full mr-4">
-                      <MessageSquare className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">New Inquiry</p>
-                      <p className="text-sm text-gray-500">
-                        About your vegetables
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">John Doe</p>
-                      <p className="text-sm text-gray-500">5 hours ago</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="products">
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold">My Products</h2>
-                  <Link href="/profile/products/add">
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add New Product
-                    </Button>
-                  </Link>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Sample Product Cards */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
-                    <h3 className="font-medium">Fresh Tomatoes</h3>
-                    <p className="text-sm text-gray-500 mb-2">₵5.99/kg</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-600">In Stock</span>
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
-                    <h3 className="font-medium">Green Beans</h3>
-                    <p className="text-sm text-gray-500 mb-2">₵3.99/kg</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-600">In Stock</span>
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
-                    <h3 className="font-medium">Sweet Potatoes</h3>
-                    <p className="text-sm text-gray-500 mb-2">₵4.50/kg</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-600">In Stock</span>
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="reviews">
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="text-center py-8">
-                  <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">No Reviews Yet</h3>
-                  <p className="text-gray-500">
-                    Your customers haven't left any reviews yet. Keep providing
-                    great service!
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="settings">
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6">Account Settings</h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Notifications</p>
-                      <p className="text-sm text-gray-500">
-                        Manage your notification preferences
-                      </p>
-                    </div>
-                    <Button variant="outline">Configure</Button>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Privacy</p>
-                      <p className="text-sm text-gray-500">
-                        Manage your privacy settings
-                      </p>
-                    </div>
-                    <Button variant="outline">Configure</Button>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Payment Methods</p>
-                      <p className="text-sm text-gray-500">
-                        Manage your payment options
-                      </p>
-                    </div>
-                    <Button variant="outline">Configure</Button>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
         </main>
       </div>
     </div>

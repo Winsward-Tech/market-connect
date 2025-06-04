@@ -2,22 +2,83 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  ShoppingBag,
-  Search,
-  VolumeIcon as VolumeUp,
-  ArrowLeft,
-  Plus,
-} from "lucide-react";
+import { ShoppingBag, ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SimpleProductCard } from "./components/ProductCard";
 import { categories } from "./lib/categories";
 import HomeNavbar from "@/components/HomeNavbar";
+import { getAllProducts } from "@/app/services/advert";
+import { toast } from "sonner";
 
 export default function MarketplacePage() {
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllProducts();
+
+        if (response?.data?.data?.products) {
+          const formattedProducts = response.data.data.products.map(
+            (product) => ({
+              id: product._id,
+              title: product.name,
+              category: product.category?.toLowerCase() || "uncategorized",
+              unit: product.unit,
+              price: product.price,
+              quantity: product.quantity,
+              description: product.description,
+              seller: product.seller,
+              location: product.location,
+              isAvailable: product.isAvailable,
+              createdAt: product.createdAt,
+              updatedAt: product.updatedAt,
+            })
+          );
+          setProducts(formattedProducts);
+        } else {
+          setProducts([]);
+        }
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Failed to load products");
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const getCategoryMatches = (productCategory, selectedCategory) => {
+    const categoryMap = {
+      "fruits-and-vegetables": ["fruits", "vegetables", "tubers"],
+      "herbs-and-spices": ["herbs", "spices"],
+      grains: ["grains", "legumes"],
+    };
+
+    if (selectedCategory === "all") return true;
+    return categoryMap[selectedCategory]?.includes(productCategory) || false;
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const title = product?.name?.toLowerCase() || "";
+    const category = product?.category?.toLowerCase() || "";
+    const searchLower = searchQuery.toLowerCase();
+
+    const matchesSearch = title.includes(searchLower);
+    const matchesCategory = getCategoryMatches(category, selectedTab);
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="min-h-screen bg-green-50">
@@ -69,7 +130,7 @@ export default function MarketplacePage() {
           <h2 className="text-2xl font-bold text-green-800 mb-6">
             Choose What You Want
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {categories.map((category) => (
               <Button
                 key={category.id}
@@ -90,57 +151,52 @@ export default function MarketplacePage() {
 
         {/* All Products */}
         <div className="bg-white rounded-xl p-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-green-800 mb-6">All Items</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <SimpleProductCard
-              title="Fresh Tomatoes"
-              seller="Ama Mensah"
-              location="Kumasi Central Market"
-              price="GH₵ 15 per kg"
-              image="/images/tomatoes.jpeg"
-              phone="+233 XX XXX XXXX"
-            />
-            <SimpleProductCard
-              title="Organic Plantains"
-              seller="Kofi Addo"
-              location="Tamale"
-              price="GH₵ 20 per bunch"
-              image="/images/plaintain.jpg"
-              phone="+233 XX XXX XXXX"
-            />
-            <SimpleProductCard
-              title="Local Rice"
-              seller="Abena Boateng"
-              location="Accra"
-              price="GH₵ 200 per 50kg bag"
-              image="/images/Local_rice.png"
-              phone="+233 XX XXX XXXX"
-            />
-            <SimpleProductCard
-              title="Fresh Cassava"
-              seller="Kwame Asante"
-              location="Volta Region"
-              price="GH₵ 30 per bundle"
-              image="/images/cassava.jpg"
-              phone="+233 XX XXX XXXX"
-            />
-            <SimpleProductCard
-              title="Pineapples"
-              seller="Efua Mensah"
-              location="Central Region"
-              price="GH₵ 10 each"
-              image="/images/pineapples.jpg"
-              phone="+233 XX XXX XXXX"
-            />
-            <SimpleProductCard
-              title="Maize"
-              seller="Yaw Osei"
-              location="Eastern Region"
-              price="GH₵ 150 per bag"
-              image="/images/bags-of-maize.jpg"
-              phone="+233 XX XXX XXXX"
-            />
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-green-800">
+              {selectedTab === "all"
+                ? "All Items"
+                : categories.find((c) => c.id === selectedTab)?.name}
+            </h2>
+            <span className="text-gray-600">
+              {filteredProducts.length}{" "}
+              {filteredProducts.length === 1 ? "item" : "items"} found
+            </span>
           </div>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading products...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-red-500">{error}</p>
+              <Button
+                className="mt-4 bg-green-600 hover:bg-green-700"
+                onClick={() => window.location.reload()}
+              >
+                Try Again
+              </Button>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">No products found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product) => (
+                <SimpleProductCard
+                  key={product.id}
+                  title={product.name}
+                  description={product.description}
+                  price={`GH₵ ${product.price} per ${product.unit}`}
+                  quantity={`${product.quantity} ${product.unit}s available`}
+                  location={product.location}
+                  category={product.category}
+                  isAvailable={product.isAvailable}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
