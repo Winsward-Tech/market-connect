@@ -69,18 +69,59 @@ export const getProductById = async (id) => {
   }
 };
 
-// Create new product
+// Create new product - Updated to handle FormData
 export const createProduct = async (productData) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.post(`${API_URL}/api/products`, productData, {
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    // Ensure we're working with FormData
+    const formData = productData instanceof FormData ? productData : new FormData();
+    
+    if (!(productData instanceof FormData)) {
+      Object.entries(productData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+    }
+
+    // Log the data being sent
+    console.log("Sending FormData to API:");
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
+    }
+
+    const config = {
       headers: {
-        Authorization: `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
       },
-    });
+      // Add these options to ensure proper FormData handling
+      transformRequest: [(data) => data],
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
+    };
+
+    const response = await axios.post(`${API_URL}/api/products`, formData, config);
     return response;
   } catch (error) {
     console.error("Error creating product:", error);
+    
+    if (error.response) {
+      console.error("Error response data:", error.response.data);
+      console.error("Error response status:", error.response.status);
+      console.error("Error response headers:", error.response.headers);
+      
+      // Log validation errors if present
+      if (error.response.data?.errors) {
+        console.error("Validation errors:", error.response.data.errors);
+      }
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+    } else {
+      console.error("Request setup error:", error.message);
+    }
+    
     throw error;
   }
 };
