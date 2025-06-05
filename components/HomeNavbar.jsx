@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Bell, Volume2, Check, Loader2 } from "lucide-react";
+import { Bell, Volume2, Check, Loader2, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -23,6 +24,19 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isMarkingRead, setIsMarkingRead] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [isTranslationDropdownOpen, setIsTranslationDropdownOpen] =
+    useState(false);
+
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "tw", name: "Twi" },
+    { code: "ee", name: "Ewe" },
+    { code: "gaa", name: "Ga" },
+    { code: "fat", name: "Fante" },
+    { code: "dag", name: "Dagbani" },
+  ];
 
   const fetchNotifications = async () => {
     try {
@@ -77,6 +91,98 @@ export default function Navbar() {
       setIsMarkingRead(false);
     }
   };
+
+  const translateText = async (text, targetLang) => {
+    if (!text || !targetLang) return text;
+
+    try {
+      const response = await fetch(
+        "https://translation-api.ghananlp.org/v1/translate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            "Ocp-Apim-Subscription-Key": "b801fcb15dc245b299b806b4c8699dce",
+          },
+          body: JSON.stringify({
+            in: text,
+            lang: `en-${targetLang}`,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Translation failed");
+      }
+
+      const translatedText = await response.text();
+      return translatedText;
+    } catch (error) {
+      console.error("Translation error:", error);
+      throw error;
+    }
+  };
+
+  const handleLanguageChange = async (languageCode) => {
+    if (languageCode === selectedLanguage) {
+      setIsTranslationDropdownOpen(false);
+      return;
+    }
+
+    try {
+      setIsTranslating(true);
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to use translation",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Store the selected language
+      setSelectedLanguage(languageCode);
+      localStorage.setItem("selectedLanguage", languageCode);
+
+      // Trigger a custom event to notify other components about language change
+      window.dispatchEvent(
+        new CustomEvent("languageChanged", {
+          detail: {
+            language: languageCode,
+            translateFunction: translateText,
+          },
+        })
+      );
+
+      toast({
+        title: "Success",
+        description: `Language changed to ${languages.find((l) => l.code === languageCode)?.name}`,
+      });
+
+      // Close the dropdown after selection
+      setIsTranslationDropdownOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to change language",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  // Load saved language preference on mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem("selectedLanguage");
+    if (savedLanguage) {
+      setSelectedLanguage(savedLanguage);
+    }
+  }, []);
 
   useEffect(() => {
     fetchNotifications();
@@ -172,9 +278,49 @@ export default function Navbar() {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="ghost" size="icon">
-              <Volume2 className="h-5 w-5 text-gray-600" />
-            </Button>
+            <DropdownMenu
+              open={isTranslationDropdownOpen}
+              onOpenChange={setIsTranslationDropdownOpen}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isTranslating}
+                  className="relative"
+                >
+                  {isTranslating ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-gray-600" />
+                  ) : (
+                    <Languages className="h-5 w-5 text-gray-600" />
+                  )}
+                  {selectedLanguage !== "en" && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full" />
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {languages.map((language) => (
+                  <DropdownMenuItem
+                    key={language.code}
+                    onClick={() => handleLanguageChange(language.code)}
+                    className={`cursor-pointer ${
+                      selectedLanguage === language.code ? "bg-gray-100" : ""
+                    }`}
+                    disabled={isTranslating}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>{language.name}</span>
+                      {selectedLanguage === language.code && (
+                        <Check className="h-4 w-4 text-green-600" />
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Link href="/profile">
               <Button variant="outline" className="hidden md:flex">
                 My Profile

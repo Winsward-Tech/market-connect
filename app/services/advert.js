@@ -82,19 +82,32 @@ export const createProduct = async (productData) => {
     
     if (!(productData instanceof FormData)) {
       Object.entries(productData).forEach(([key, value]) => {
-        formData.append(key, value);
+        if (key === 'images' && Array.isArray(value)) {
+          // Handle multiple images
+          value.forEach((image, index) => {
+            formData.append(`images`, image);
+          });
+        } else {
+          formData.append(key, value);
+        }
       });
     }
 
-    // Log the data being sent
-    console.log("Sending FormData to API:");
+    // Debug: Log the complete FormData
+    console.log("=== FormData Contents ===");
     for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
+      if (value instanceof File) {
+        console.log(`${key}: File(${value.name}, ${value.type}, ${value.size} bytes)`);
+      } else {
+        console.log(`${key}: ${value}`);
+      }
     }
+    console.log("=======================");
 
     const config = {
       headers: {
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
       },
       // Add these options to ensure proper FormData handling
       transformRequest: [(data) => data],
@@ -102,25 +115,36 @@ export const createProduct = async (productData) => {
       maxBodyLength: Infinity
     };
 
+    // Debug: Log the complete request configuration
+    console.log("=== Request Configuration ===");
+    console.log("URL:", `${API_URL}/api/products`);
+    console.log("Headers:", config.headers);
+    console.log("=======================");
+
     const response = await axios.post(`${API_URL}/api/products`, formData, config);
     return response;
   } catch (error) {
-    console.error("Error creating product:", error);
+    console.error("=== Error Details ===");
+    console.error("Error message:", error.message);
     
     if (error.response) {
-      console.error("Error response data:", error.response.data);
-      console.error("Error response status:", error.response.status);
-      console.error("Error response headers:", error.response.headers);
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error("Response status:", error.response.status);
+      console.error("Response headers:", error.response.headers);
+      console.error("Response data:", error.response.data);
       
-      // Log validation errors if present
       if (error.response.data?.errors) {
         console.error("Validation errors:", error.response.data.errors);
       }
     } else if (error.request) {
-      console.error("No response received:", error.request);
+      // The request was made but no response was received
+      console.error("No response received. Request details:", error.request);
     } else {
+      // Something happened in setting up the request that triggered an Error
       console.error("Request setup error:", error.message);
     }
+    console.error("=======================");
     
     throw error;
   }

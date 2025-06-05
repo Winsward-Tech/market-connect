@@ -7,23 +7,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Upload } from "lucide-react";
+import { ArrowLeft, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { createProduct } from "@/app/services/advert";
 
 export default function AddProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [formData, setFormData] = useState({
-    title: "",
+    name: "",
     description: "",
     price: "",
     category: "vegetables",
     quantity: "",
     unit: "kg",
     location: "",
-    image: null,
+    stock: "",
+    images: [],
   });
   const [error, setError] = useState("");
 
@@ -36,19 +37,57 @@ export default function AddProductPage() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        image: file,
-      }));
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      // Validate total number of images (max 5)
+      if (formData.images.length + files.length > 5) {
+        toast.error("Maximum 5 images allowed");
+        return;
+      }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      // Validate each file
+      const validFiles = files.filter((file) => {
+        // Check file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+          toast.error(`${file.name} is too large. Max size is 5MB`);
+          return false;
+        }
+
+        // Check file type
+        const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+        if (!allowedTypes.includes(file.type)) {
+          toast.error(`${file.name} is not a valid image file`);
+          return false;
+        }
+
+        return true;
+      });
+
+      if (validFiles.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          images: [...prev.images, ...validFiles],
+        }));
+
+        // Create previews for new images
+        validFiles.forEach((file) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImagePreviews((prev) => [...prev, reader.result]);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
     }
+  };
+
+  const removeImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -59,14 +98,24 @@ export default function AddProductPage() {
     try {
       // Validate required fields
       const requiredFields = {
-        title: formData.title?.trim(),
+        name: formData.name?.trim(),
         description: formData.description?.trim(),
         price: parseFloat(formData.price),
         category: formData.category,
         quantity: parseInt(formData.quantity, 10),
         unit: formData.unit,
         location: formData.location?.trim(),
+        stock: parseInt(formData.stock, 10),
       };
+
+      // Debug: Log the form data before validation
+      console.log("=== Form Data Before Validation ===");
+      console.log(requiredFields);
+      console.log(
+        "Images:",
+        formData.images.map((img) => img.name)
+      );
+      console.log("================================");
 
       // Validate numeric fields
       if (isNaN(requiredFields.price) || requiredFields.price <= 0) {
@@ -77,29 +126,25 @@ export default function AddProductPage() {
         throw new Error("Please enter a valid quantity greater than 0");
       }
 
+      if (isNaN(requiredFields.stock) || requiredFields.stock < 0) {
+        throw new Error("Please enter a valid stock quantity");
+      }
+
       // Check for empty required fields
       const emptyFields = Object.entries(requiredFields)
-        .filter(([_, value]) => value === undefined || value === null || value === '')
+        .filter(
+          ([_, value]) => value === undefined || value === null || value === ""
+        )
         .map(([key]) => key);
 
       if (emptyFields.length > 0) {
-        throw new Error(`Please fill in all required fields: ${emptyFields.join(", ")}`);
+        throw new Error(
+          `Please fill in all required fields: ${emptyFields.join(", ")}`
+        );
       }
 
-      if (!formData.image) {
-        throw new Error("Please select an image for your product");
-      }
-
-      // Validate image size (max 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-      if (formData.image.size > maxSize) {
-        throw new Error("Image size should be less than 5MB");
-      }
-
-      // Validate image type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-      if (!allowedTypes.includes(formData.image.type)) {
-        throw new Error("Please upload a valid image file (JPEG, PNG)");
+      if (formData.images.length === 0) {
+        throw new Error("Please select at least one image for your product");
       }
 
       // Check if token exists
@@ -110,34 +155,51 @@ export default function AddProductPage() {
 
       // Build FormData
       const formDataToSend = new FormData();
-      
-      // Add all fields to FormData with explicit string conversion
-      formDataToSend.append("title", String(requiredFields.title));
-      formDataToSend.append("description", String(requiredFields.description));
-      formDataToSend.append("price", String(requiredFields.price));
-      formDataToSend.append("category", String(requiredFields.category));
-      formDataToSend.append("quantity", String(requiredFields.quantity));
-      formDataToSend.append("unit", String(requiredFields.unit));
-      formDataToSend.append("location", String(requiredFields.location));
-      formDataToSend.append("image", formData.image);
 
-      // Debug: Log the data being sent
-      console.log("Form data being sent:");
+      // Add all fields to FormData with explicit string conversion
+      Object.entries(requiredFields).forEach(([key, value]) => {
+        // Ensure numbers are properly formatted
+        if (typeof value === "number") {
+          formDataToSend.append(key, value.toString());
+        } else {
+          formDataToSend.append(key, String(value));
+        }
+      });
+
+      // Add images
+      formData.images.forEach((image) => {
+        formDataToSend.append("images", image);
+      });
+
+      // Debug: Log the final FormData being sent
+      console.log("=== Final FormData Being Sent ===");
       for (let [key, value] of formDataToSend.entries()) {
-        console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
+        if (value instanceof File) {
+          console.log(
+            `${key}: File(${value.name}, ${value.type}, ${value.size} bytes)`
+          );
+        } else {
+          console.log(`${key}: ${value}`);
+        }
       }
+      console.log("================================");
 
       // Use the centralized API function
       const response = await createProduct(formDataToSend);
 
-      if (response.data?.success || response.status === 200 || response.status === 201) {
+      if (
+        response.data?.success ||
+        response.status === 200 ||
+        response.status === 201
+      ) {
         toast.success("Product created successfully!");
         router.push("/profile/products");
       } else {
         throw new Error(response.data?.message || "Failed to create product");
       }
     } catch (err) {
-      console.error("Error creating product:", err);
+      console.error("=== Form Submission Error ===");
+      console.error(err);
 
       let errorMessage = "Failed to create product";
 
@@ -146,7 +208,9 @@ export default function AddProductPage() {
       } else if (err.response?.data?.errors) {
         const errors = err.response.data.errors;
         if (Array.isArray(errors)) {
-          errorMessage = errors.map(err => `${err.field}: ${err.message}`).join(", ");
+          errorMessage = errors
+            .map((err) => `${err.field}: ${err.message}`)
+            .join(", ");
         } else if (typeof errors === "object") {
           errorMessage = Object.values(errors).flat().join(", ");
         }
@@ -183,49 +247,54 @@ export default function AddProductPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Image Upload */}
               <div className="space-y-2">
-                <Label>Product Image *</Label>
-                <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      {imagePreview ? (
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="max-h-48 object-contain"
-                        />
-                      ) : (
-                        <>
-                          <Upload className="w-8 h-8 mb-4 text-gray-500" />
-                          <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>{" "}
-                            or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            PNG, JPG or JPEG
-                          </p>
-                        </>
-                      )}
+                <Label>Product Images * (Max 5)</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      required
-                    />
-                  </label>
+                  ))}
+                  {imagePreviews.length < 5 && (
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-8 h-8 mb-4 text-gray-500" />
+                        <p className="mb-2 text-sm text-gray-500">
+                          <span className="font-semibold">Click to upload</span>
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          PNG, JPG or JPEG
+                        </p>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        multiple
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
 
-              {/* Product Title */}
+              {/* Product Name */}
               <div className="space-y-2">
-                <Label htmlFor="title">Product Title *</Label>
+                <Label htmlFor="name">Product Name *</Label>
                 <Input
-                  id="title"
-                  name="title"
-                  value={formData.title}
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
                   placeholder="Enter product name"
                   required
@@ -312,6 +381,21 @@ export default function AddProductPage() {
                   <option value="piece">Piece</option>
                   <option value="bundle">Bundle</option>
                 </select>
+              </div>
+
+              {/* Stock */}
+              <div className="space-y-2">
+                <Label htmlFor="stock">Stock *</Label>
+                <Input
+                  id="stock"
+                  name="stock"
+                  type="number"
+                  min="0"
+                  value={formData.stock}
+                  onChange={handleInputChange}
+                  placeholder="Enter available stock"
+                  required
+                />
               </div>
 
               {/* Location */}
