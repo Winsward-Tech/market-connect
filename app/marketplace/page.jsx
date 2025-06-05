@@ -169,7 +169,7 @@ export default function MarketplacePage() {
             </div>
           ) : error ? (
             <div className="text-center py-8">
-              <p className="text-red-500">{error}</p>
+              <p className="text-red-400">{error}</p>
               <Button
                 className="mt-4 bg-green-600 hover:bg-green-700"
                 onClick={() => window.location.reload()}
