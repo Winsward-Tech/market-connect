@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4800/api";
+const API_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // Mock data for testing
 const mockForums = [
@@ -78,28 +78,8 @@ const mockForums = [
 const USE_MOCK_DATA = true;
 
 export const createForum = async (forumData, token) => {
-  if (USE_MOCK_DATA) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newForum = {
-          id: Date.now().toString(),
-          ...forumData,
-          author: "Current User",
-          authorRole: "Farmer",
-          location: "Your Location",
-          date: "Just now",
-          replies: 0,
-          likes: 0,
-          hasAudio: false,
-        };
-        mockForums.unshift(newForum);
-        resolve(newForum);
-      }, 500);
-    });
-  }
-
   try {
-    const response = await fetch(`${API_URL}/forums`, {
+    const response = await fetch(`${API_URL}/api/forums`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -108,11 +88,12 @@ export const createForum = async (forumData, token) => {
       body: JSON.stringify(forumData),
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error("Failed to create forum post");
+      throw new Error(data.message || "Failed to create forum post");
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error("Error creating forum:", error);
     throw error;
@@ -120,32 +101,20 @@ export const createForum = async (forumData, token) => {
 };
 
 export const getForumById = async (id, token) => {
-  if (USE_MOCK_DATA) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const forum = mockForums.find((f) => f.id === id);
-        if (forum) {
-          resolve(forum);
-        } else {
-          reject(new Error("Forum not found"));
-        }
-      }, 500);
-    });
-  }
-
   try {
-    const response = await fetch(`${API_URL}/forums/${id}`, {
+    const response = await fetch(`${API_URL}/api/forums/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error("Failed to fetch forum post");
+      throw new Error(data.message || "Failed to fetch forum post");
     }
 
-    return await response.json();
+    return data.data.forum;
   } catch (error) {
     console.error("Error fetching forum:", error);
     throw error;
@@ -153,27 +122,20 @@ export const getForumById = async (id, token) => {
 };
 
 export const getAllForums = async (token) => {
-  if (USE_MOCK_DATA) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([...mockForums]);
-      }, 500);
-    });
-  }
-
   try {
-    const response = await fetch(`${API_URL}/forums`, {
+    const response = await fetch(`${API_URL}/api/forums`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error("Failed to fetch forum posts");
+      throw new Error(data.message || "Failed to fetch forum posts");
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error("Error fetching forums:", error);
     throw error;
@@ -181,30 +143,20 @@ export const getAllForums = async (token) => {
 };
 
 export const getForumsByCategory = async (category, token) => {
-  if (USE_MOCK_DATA) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const filteredForums = mockForums.filter(
-          (forum) => forum.category === category
-        );
-        resolve(filteredForums);
-      }, 500);
-    });
-  }
-
   try {
-    const response = await fetch(`${API_URL}/forums/category/${category}`, {
+    const response = await fetch(`${API_URL}/api/forums/category/${category}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error("Failed to fetch forum posts by category");
+      throw new Error(data.message || "Failed to fetch forums by category");
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error("Error fetching forums by category:", error);
     throw error;
@@ -212,37 +164,37 @@ export const getForumsByCategory = async (category, token) => {
 };
 
 export const addComment = async (forumId, commentData, token) => {
-  if (USE_MOCK_DATA) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newComment = {
-          id: Date.now().toString(),
-          ...commentData,
-          author: "Current User",
-          authorRole: "Farmer",
-          date: "Just now",
-          likes: 0,
-        };
-        resolve(newComment);
-      }, 500);
-    });
-  }
-
   try {
-    const response = await fetch(`${API_URL}/comments/forum/${forumId}`, {
+    console.log('Adding comment with data:', {
+      forumId,
+      commentData,
+      token: token ? 'present' : 'missing'
+    });
+
+    const response = await fetch(`${API_URL}/api/comments/forum/${forumId}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(commentData),
+      body: JSON.stringify({
+        content: commentData.content
+      }),
     });
 
+    console.log('Comment API Response:', {
+      status: response.status,
+      statusText: response.statusText
+    });
+
+    const data = await response.json();
+    console.log('Comment API Response Data:', data);
+
     if (!response.ok) {
-      throw new Error("Failed to add comment");
+      throw new Error(data.message || "Failed to add comment");
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error("Error adding comment:", error);
     throw error;
@@ -250,44 +202,20 @@ export const addComment = async (forumId, commentData, token) => {
 };
 
 export const getComments = async (forumId, token) => {
-  if (USE_MOCK_DATA) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: "1",
-            content: "Try storing them in a dry, elevated place",
-            author: "Kwame Mensah",
-            authorRole: "Farmer",
-            date: "1 day ago",
-            likes: 5,
-          },
-          {
-            id: "2",
-            content: "I use banana leaves to wrap them",
-            author: "Ama Kufuor",
-            authorRole: "Farmer",
-            date: "2 days ago",
-            likes: 3,
-          },
-        ]);
-      }, 500);
-    });
-  }
-
   try {
-    const response = await fetch(`${API_URL}/comments/forum/${forumId}`, {
+    const response = await fetch(`${API_URL}/api/comments/forum/${forumId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error("Failed to fetch comments");
+      throw new Error(data.message || "Failed to fetch comments");
     }
 
-    return await response.json();
+    return data.data.comments || [];
   } catch (error) {
     console.error("Error fetching comments:", error);
     throw error;
