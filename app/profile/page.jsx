@@ -51,6 +51,7 @@ export default function ProfilePage() {
     location: "",
     preferredLanguage: "en",
   });
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -148,13 +149,23 @@ export default function ProfilePage() {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <Link href="/">
+            <Link href="/home">
               <Button variant="ghost" className="text-white p-0 mr-2">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
+          </div>
+          <div className="flex items-center gap-2">
             <User className="h-6 w-6" />
             <h1 className="text-xl font-bold">My Profile</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="text-white">
+              <VolumeUp className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-white">
+              <Settings className="h-5 w-5" />
+            </Button>
           </div>
         </header>
         <div className="p-8">
@@ -185,13 +196,23 @@ export default function ProfilePage() {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <Link href="/">
+            <Link href="/home">
               <Button variant="ghost" className="text-white p-0 mr-2">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
+          </div>
+          <div className="flex items-center gap-2">
             <User className="h-6 w-6" />
             <h1 className="text-xl font-bold">My Profile</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="text-white">
+              <VolumeUp className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-white">
+              <Settings className="h-5 w-5" />
+            </Button>
           </div>
         </header>
         <div className="p-8">
@@ -221,11 +242,13 @@ export default function ProfilePage() {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <Link href="/">
+          <Link href="/home">
             <Button variant="ghost" className="text-white p-0 mr-2">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
+        </div>
+        <div className="flex items-center gap-2">
           <User className="h-6 w-6" />
           <h1 className="text-xl font-bold">My Profile</h1>
         </div>
@@ -353,11 +376,7 @@ export default function ProfilePage() {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("userId");
-                  router.push("/auth/login");
-                }}
+                onClick={() => setShowLogoutConfirm(true)}
               >
                 <LogOut className="h-5 w-5" />
                 Logout
@@ -606,8 +625,8 @@ export default function ProfilePage() {
                             product.status === "active"
                               ? "text-green-600"
                               : product.status === "sold"
-                              ? "text-red-600"
-                              : "text-gray-600"
+                                ? "text-red-600"
+                                : "text-gray-600"
                           }`}
                         >
                           {product.status?.charAt(0).toUpperCase() +
@@ -783,6 +802,34 @@ export default function ProfilePage() {
           )}
         </main>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
+            <h2 className="text-lg font-bold mb-4">Confirm Logout</h2>
+            <p className="mb-6">Are you sure you want to logout?</p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("userId");
+                  router.push("/");
+                }}
+              >
+                Yes, Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

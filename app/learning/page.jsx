@@ -675,9 +675,17 @@ const LearningPlatform = () => {
       <HomeNavbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-green-800 mb-6">
-          Learning Resources
-        </h1>
+        <div className="flex items-center gap-2 mb-6">
+          <Link href="/home">
+            <button
+              aria-label="Back to Home"
+              className="p-2 rounded-full hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              <ArrowLeft className="h-6 w-6 text-green-800" />
+            </button>
+          </Link>
+          <h1 className="text-3xl font-bold text-green-800">Learning Resources</h1>
+        </div>
 
         <p className="text-lg mb-8">
           Access educational content on business, farming, and health in your
