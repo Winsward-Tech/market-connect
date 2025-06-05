@@ -181,7 +181,7 @@ export default function DashboardPage() {
             <div className="container mx-auto p-4">
               <TabsContent value="products" className="mt-0">
                 <div className="flex justify-end mb-4">
-                  <Link href="/marketplace/dashboard/add-product">
+                  <Link href="/profile/products/add">
                     <Button className="bg-green-600 hover:bg-green-700">
                       <Plus className="mr-2 h-4 w-4" />
                       Add New Product

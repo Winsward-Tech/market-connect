@@ -26,7 +26,8 @@ export default function Navbar() {
   const [isMarkingRead, setIsMarkingRead] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
-  const [isTranslationDropdownOpen, setIsTranslationDropdownOpen] = useState(false);
+  const [isTranslationDropdownOpen, setIsTranslationDropdownOpen] =
+    useState(false);
 
   const languages = [
     { code: "en", name: "English" },
@@ -93,20 +94,23 @@ export default function Navbar() {
 
   const translateText = async (text, targetLang) => {
     if (!text || !targetLang) return text;
-    
+
     try {
-      const response = await fetch("https://translation-api.ghananlp.org/v1/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-          "Ocp-Apim-Subscription-Key": "68ff973bba3e42fca7e50e9e4aa78c15",
-        },
-        body: JSON.stringify({
-          in: text,
-          lang: `en-${targetLang}`,
-        }),
-      });
+      const response = await fetch(
+        "https://translation-api.ghananlp.org/v1/translate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            "Ocp-Apim-Subscription-Key": "b801fcb15dc245b299b806b4c8699dce",
+          },
+          body: JSON.stringify({
+            in: text,
+            lang: `en-${targetLang}`,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -145,16 +149,18 @@ export default function Navbar() {
       localStorage.setItem("selectedLanguage", languageCode);
 
       // Trigger a custom event to notify other components about language change
-      window.dispatchEvent(new CustomEvent("languageChanged", { 
-        detail: { 
-          language: languageCode,
-          translateFunction: translateText 
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent("languageChanged", {
+          detail: {
+            language: languageCode,
+            translateFunction: translateText,
+          },
+        })
+      );
 
       toast({
         title: "Success",
-        description: `Language changed to ${languages.find(l => l.code === languageCode)?.name}`,
+        description: `Language changed to ${languages.find((l) => l.code === languageCode)?.name}`,
       });
 
       // Close the dropdown after selection
@@ -272,11 +278,14 @@ export default function Navbar() {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-            <DropdownMenu open={isTranslationDropdownOpen} onOpenChange={setIsTranslationDropdownOpen}>
+            <DropdownMenu
+              open={isTranslationDropdownOpen}
+              onOpenChange={setIsTranslationDropdownOpen}
+            >
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   disabled={isTranslating}
                   className="relative"
                 >

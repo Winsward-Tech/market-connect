@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -57,8 +63,19 @@ import {
   addComment,
   getComments,
 } from "@/app/services/forum";
-import { translateText, LANGUAGE_PAIRS, getLanguageName } from "@/app/services/translation";
-import { textToSpeech, SUPPORTED_LANGUAGES, getDefaultSpeaker, getLanguageCode, isLanguageSupportedForTTS } from "@/app/services/tts";
+import {
+  translateText,
+  LANGUAGE_PAIRS,
+  getLanguageName,
+} from "@/app/services/translation";
+import {
+  textToSpeech,
+  SUPPORTED_LANGUAGES,
+  getDefaultSpeaker,
+  getLanguageCode,
+  isLanguageSupportedForTTS,
+} from "@/app/services/tts";
+import { useRouter } from "next/navigation";
 
 // Separate the DiscussionCard component to reduce re-renders
 const DiscussionCard = React.memo(function DiscussionCard({
@@ -107,31 +124,31 @@ const DiscussionCard = React.memo(function DiscussionCard({
         return {
           color: "bg-green-100 text-[#15803D]",
           icon: <Sprout className="w-4 h-4 mr-1" />,
-          label: "Farming Tips"
+          label: "Farming Tips",
         };
       case "marketing":
         return {
           color: "bg-orange-100 text-orange-700",
           icon: <ShoppingBasket className="w-4 h-4 mr-1" />,
-          label: "Marketing Strategies"
+          label: "Marketing Strategies",
         };
       case "logistics":
         return {
           color: "bg-blue-100 text-blue-700",
           icon: <Truck className="w-4 h-4 mr-1" />,
-          label: "Logistics & Distribution"
+          label: "Logistics & Distribution",
         };
       case "health":
         return {
           color: "bg-red-100 text-red-700",
           icon: <Heart className="w-4 h-4 mr-1" />,
-          label: "Health & Safety"
+          label: "Health & Safety",
         };
       default:
         return {
           color: "bg-gray-100 text-gray-700",
           icon: <HelpCircle className="w-4 h-4 mr-1" />,
-          label: "General Discussion"
+          label: "General Discussion",
         };
     }
   }, [category]);
@@ -140,9 +157,9 @@ const DiscussionCard = React.memo(function DiscussionCard({
     try {
       if (!audioUrl) {
         const text = translatedContent?.content || content;
-        const language = getLanguageCode(selectedLanguage.split('-')[1]);
+        const language = getLanguageCode(selectedLanguage.split("-")[1]);
         const speaker = getDefaultSpeaker(language);
-        
+
         const url = await textToSpeech(text, language, speaker);
         setAudioUrl(url);
       }
@@ -157,11 +174,11 @@ const DiscussionCard = React.memo(function DiscussionCard({
         setIsPlaying(!isPlaying);
       }
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error("Error playing audio:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to play audio"
+        description: "Failed to play audio",
       });
     }
   };
@@ -180,7 +197,10 @@ const DiscussionCard = React.memo(function DiscussionCard({
       <CardHeader className="pb-3">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-3">
           <CardTitle className="text-xl text-gray-800 flex-1">
-            <Link href={`/community/${id}`} className="hover:text-[#15803D] transition-colors">
+            <Link
+              href={`/community/${id}`}
+              className="hover:text-[#15803D] transition-colors"
+            >
               {translatedContent?.title || title}
             </Link>
           </CardTitle>
@@ -225,7 +245,9 @@ const DiscussionCard = React.memo(function DiscussionCard({
 
       <CardContent className="pb-4">
         <div className="space-y-4">
-          <p className="text-base text-gray-700">{translatedContent?.content || content}</p>
+          <p className="text-base text-gray-700">
+            {translatedContent?.content || content}
+          </p>
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <Select
@@ -236,15 +258,23 @@ const DiscussionCard = React.memo(function DiscussionCard({
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_TWI}>Twi</SelectItem>
+                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_TWI}>
+                  Twi
+                </SelectItem>
                 <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_GA}>Ga</SelectItem>
-                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_EWE}>Ewe</SelectItem>
-                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_FANTE}>Fante</SelectItem>
-                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_DAGBANI}>Dagbani</SelectItem>
+                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_EWE}>
+                  Ewe
+                </SelectItem>
+                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_FANTE}>
+                  Fante
+                </SelectItem>
+                <SelectItem value={LANGUAGE_PAIRS.ENGLISH_TO_DAGBANI}>
+                  Dagbani
+                </SelectItem>
               </SelectContent>
             </Select>
 
-              <Button
+            <Button
               onClick={() => handleTranslate(id, selectedLanguage)}
               disabled={isTranslating}
               variant="outline"
@@ -252,12 +282,12 @@ const DiscussionCard = React.memo(function DiscussionCard({
             >
               <Languages className="h-4 w-4 mr-2" />
               {isTranslating ? "Translating..." : "Translate"}
-              </Button>
+            </Button>
 
             {translatedContent && (
               <>
-                {isLanguageSupportedForTTS(selectedLanguage.split('-')[1]) && (
-                <Button
+                {isLanguageSupportedForTTS(selectedLanguage.split("-")[1]) && (
+                  <Button
                     onClick={handlePlayAudio}
                     variant="outline"
                     className="flex-1 sm:flex-none items-center border-[#15803D] text-[#15803D] hover:bg-[#15803D] hover:text-white transition-colors"
@@ -268,36 +298,38 @@ const DiscussionCard = React.memo(function DiscussionCard({
                       <Play className="h-4 w-4 mr-2" />
                     )}
                     {isPlaying ? "Pause" : "Listen"}
-                </Button>
+                  </Button>
                 )}
 
-                    <Button
+                <Button
                   onClick={() => setTranslatedContent(null)}
-                      variant="ghost"
-                      size="sm"
+                  variant="ghost"
+                  size="sm"
                   className="flex-1 sm:flex-none text-[#15803D] hover:bg-[#15803D]/10"
                 >
                   Show Original
                 </Button>
-                        </>
-                      )}
-                  </div>
-                  </div>
+              </>
+            )}
+          </div>
+        </div>
       </CardContent>
 
       <CardFooter className="pt-2 pb-4">
         <div className="flex flex-wrap items-center gap-4 w-full">
-                          <Button
+          <Button
             variant="ghost"
             size="sm"
             className="flex-1 sm:flex-none items-center text-gray-600 hover:text-[#15803D] hover:bg-[#15803D]/10"
             onClick={() => handleLike(id)}
           >
-            <Heart className={`h-4 w-4 mr-1 ${likes > 0 ? "text-[#15803D]" : ""}`} />
+            <Heart
+              className={`h-4 w-4 mr-1 ${likes > 0 ? "text-[#15803D]" : ""}`}
+            />
             {likes}
-                          </Button>
+          </Button>
 
-                    <Button
+          <Button
             variant="ghost"
             size="sm"
             className="flex-1 sm:flex-none items-center text-gray-600 hover:text-[#15803D] hover:bg-[#15803D]/10"
@@ -305,9 +337,9 @@ const DiscussionCard = React.memo(function DiscussionCard({
           >
             <MessageSquare className="h-4 w-4 mr-1" />
             {replies}
-                    </Button>
+          </Button>
 
-                    <Button
+          <Button
             variant="ghost"
             size="sm"
             className="flex-1 sm:flex-none items-center text-gray-600 hover:text-[#15803D] hover:bg-[#15803D]/10"
@@ -315,17 +347,17 @@ const DiscussionCard = React.memo(function DiscussionCard({
           >
             <Reply className="h-4 w-4 mr-1" />
             Answer
-                    </Button>
-                  </div>
+          </Button>
+        </div>
       </CardFooter>
 
-          {showComments && (
+      {showComments && (
         <div className="px-6 pb-4">
           <div className="space-y-4">
-              {isLoadingComments ? (
+            {isLoadingComments ? (
               <div className="text-center py-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#15803D] mx-auto"></div>
-                </div>
+              </div>
             ) : comments.length > 0 ? (
               comments.map((comment) => (
                 <div
@@ -333,37 +365,41 @@ const DiscussionCard = React.memo(function DiscussionCard({
                   className="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg"
                 >
                   <div className="w-8 h-8 rounded-full bg-[#15803D]/10 flex items-center justify-center flex-shrink-0">
-                          <span className="text-[#15803D] font-bold text-sm">
-                            {comment.author
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </span>
-                        </div>
+                    <span className="text-[#15803D] font-bold text-sm">
+                      {comment.author
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </span>
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-sm text-gray-800 truncate">
-                              {comment.author}
+                        {comment.author}
                       </span>
-                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">{comment.date}</span>
-                            </div>
-                    <p className="text-sm text-gray-600 mt-1 break-words">{comment.content}</p>
-                          </div>
-                          </div>
+                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                        {comment.date}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1 break-words">
+                      {comment.content}
+                    </p>
+                  </div>
+                </div>
               ))
             ) : (
               <p className="text-center text-gray-500 py-4">No comments yet</p>
             )}
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    <Input
-                      placeholder="Write a comment..."
-                      value={commentContent}
-                      onChange={(e) => setCommentContent(e.target.value)}
+              <Input
+                placeholder="Write a comment..."
+                value={commentContent}
+                onChange={(e) => setCommentContent(e.target.value)}
                 className="flex-1 border-[#15803D]/20 focus:border-[#15803D] focus:ring-[#15803D]/20"
-                    />
-                    <Button
-                      onClick={() => handleCommentSubmit(id)}
+              />
+              <Button
+                onClick={() => handleCommentSubmit(id)}
                 disabled={isSubmittingComment || !commentContent.trim()}
                 className="bg-[#15803D] hover:bg-[#15803D]/90 text-white"
               >
@@ -372,9 +408,9 @@ const DiscussionCard = React.memo(function DiscussionCard({
                 ) : (
                   "Post"
                 )}
-                    </Button>
-                  </div>
+              </Button>
             </div>
+          </div>
         </div>
       )}
 
@@ -382,7 +418,7 @@ const DiscussionCard = React.memo(function DiscussionCard({
         ref={audioRef}
         src={audioUrl}
         onEnded={() => setIsPlaying(false)}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
       />
     </Card>
   );
@@ -398,6 +434,7 @@ const categories = [
 
 export default function CommunityPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [isPlaying, setIsPlaying] = useState({});
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [isAnswerModalOpen, setIsAnswerModalOpen] = useState({});
@@ -420,11 +457,14 @@ export default function CommunityPage() {
   const [comments, setComments] = useState({});
   const [isLoadingComments, setIsLoadingComments] = useState({});
   const [showComments, setShowComments] = useState({});
-  const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGE_PAIRS.ENGLISH_TO_TWI);
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    LANGUAGE_PAIRS.ENGLISH_TO_TWI
+  );
   const [isTranslating, setIsTranslating] = useState(false);
   const [translatedPosts, setTranslatedPosts] = useState({});
   const [notifications, setNotifications] = useState([]);
-  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] =
+    useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Calculate pagination
@@ -462,7 +502,7 @@ export default function CommunityPage() {
         }
 
         // Transform the data to match the expected format
-        const transformedData = response.data.forums.map(post => ({
+        const transformedData = response.data.forums.map((post) => ({
           id: post._id,
           title: post.title,
           content: post.content,
@@ -473,7 +513,7 @@ export default function CommunityPage() {
           date: new Date(post.createdAt).toLocaleDateString(),
           replies: 0,
           likes: post.likes?.length || 0,
-          hasAudio: false
+          hasAudio: false,
         }));
 
         console.log("Transformed forum data:", transformedData);
@@ -550,17 +590,20 @@ export default function CommunityPage() {
         return;
       }
 
-      const response = await fetch("https://translation-api.ghananlp.org/api/comments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          forumId,
-          content: commentContent.trim(),
-        }),
-      });
+      const response = await fetch(
+        "https://translation-api.ghananlp.org/api/comments",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            forumId,
+            content: commentContent.trim(),
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -568,9 +611,9 @@ export default function CommunityPage() {
       }
 
       const data = await response.json();
-      
+
       // Update the comments for this forum
-      setComments(prev => ({
+      setComments((prev) => ({
         ...prev,
         [forumId]: [
           ...(prev[forumId] || []),
@@ -585,7 +628,7 @@ export default function CommunityPage() {
 
       // Clear the comment input
       setCommentContent("");
-      
+
       // Show success message
       toast({
         title: "Success",
@@ -595,7 +638,8 @@ export default function CommunityPage() {
       console.error("Error posting comment:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to post comment. Please try again.",
+        description:
+          error.message || "Failed to post comment. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -644,7 +688,7 @@ export default function CommunityPage() {
   };
 
   const handleTranslate = async (postId, langPair) => {
-    const post = forumPosts.find(f => f.id === postId);
+    const post = forumPosts.find((f) => f.id === postId);
     if (!post) return;
 
     try {
@@ -653,28 +697,28 @@ export default function CommunityPage() {
 
       // Translate title
       const translatedTitle = await translateText(post.title, langPair);
-      
+
       // Translate content
       const translatedContent = await translateText(post.content, langPair);
 
-      setTranslatedPosts(prev => ({
+      setTranslatedPosts((prev) => ({
         ...prev,
         [postId]: {
           title: translatedTitle,
-          content: translatedContent
-        }
+          content: translatedContent,
+        },
       }));
 
       toast({
         title: "Success",
-        description: `Translated to ${getLanguageName(langPair.split('-')[1])}`
+        description: `Translated to ${getLanguageName(langPair.split("-")[1])}`,
       });
     } catch (error) {
-      console.error('Translation error:', error);
+      console.error("Translation error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || 'Translation failed'
+        description: error.message || "Translation failed",
       });
     } finally {
       setIsTranslating(false);
@@ -682,9 +726,9 @@ export default function CommunityPage() {
   };
 
   const handleAnswer = (forumId) => {
-    setIsAnswerModalOpen(prev => ({
+    setIsAnswerModalOpen((prev) => ({
       ...prev,
-      [forumId]: true
+      [forumId]: true,
     }));
   };
 
@@ -694,11 +738,14 @@ export default function CommunityPage() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await fetch("https://translation-api.ghananlp.org/api/notifications", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://translation-api.ghananlp.org/api/notifications",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch notifications");
@@ -706,7 +753,7 @@ export default function CommunityPage() {
 
       const data = await response.json();
       setNotifications(data);
-      setUnreadCount(data.filter(n => !n.read).length);
+      setUnreadCount(data.filter((n) => !n.read).length);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
@@ -718,24 +765,25 @@ export default function CommunityPage() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await fetch(`https://translation-api.ghananlp.org/api/notifications/${notificationId}/read`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `https://translation-api.ghananlp.org/api/notifications/${notificationId}/read`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to mark notification as read");
       }
 
       // Update local state
-      setNotifications(prev =>
-        prev.map(n =>
-          n.id === notificationId ? { ...n, read: true } : n
-        )
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -747,21 +795,22 @@ export default function CommunityPage() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await fetch("https://translation-api.ghananlp.org/api/notifications/read-all", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://translation-api.ghananlp.org/api/notifications/read-all",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to mark all notifications as read");
       }
 
       // Update local state
-      setNotifications(prev =>
-        prev.map(n => ({ ...n, read: true }))
-      );
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
@@ -807,17 +856,29 @@ export default function CommunityPage() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
           <div className="w-full lg:w-auto">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Community Forum</h1>
+            <div className="flex items-center gap-2 mb-2">
+              <Link href="/home">
+                <button
+                  aria-label="Back to Home"
+                  className="p-2 rounded-full hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400"
+                >
+                  <ArrowLeft className="h-6 w-6 text-green-800" />
+                </button>
+              </Link>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Community Forum
+              </h1>
+            </div>
             <p className="text-gray-600 max-w-2xl">
               Connect with other farmers and share your experiences
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <div className="flex-1 sm:flex-none">
-                <Input
+              <Input
                 placeholder="Search discussions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full sm:w-[200px] border-[#15803D]/20 focus:border-[#15803D] focus:ring-[#15803D]/20"
               />
             </div>
@@ -889,7 +950,7 @@ export default function CommunityPage() {
                 handleTranslate={handleTranslate}
                 translatedContent={translatedPosts[post.id]}
                 setTranslatedContent={() => {
-                  setTranslatedPosts(prev => {
+                  setTranslatedPosts((prev) => {
                     const newPosts = { ...prev };
                     delete newPosts[post.id];
                     return newPosts;
@@ -905,31 +966,35 @@ export default function CommunityPage() {
           <div className="flex justify-center items-center gap-4 mt-8">
             <Button
               variant="outline"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className="border-[#15803D]/20 text-[#15803D] hover:bg-[#15803D]/10"
             >
               Previous
             </Button>
             <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "default" : "outline"}
-                  onClick={() => setCurrentPage(page)}
-                  className={
-                    currentPage === page
-                      ? "bg-[#15803D] hover:bg-[#15803D]/90 text-white"
-                      : "border-[#15803D]/20 text-[#15803D] hover:bg-[#15803D]/10"
-                  }
-                >
-                  {page}
-                </Button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    onClick={() => setCurrentPage(page)}
+                    className={
+                      currentPage === page
+                        ? "bg-[#15803D] hover:bg-[#15803D]/90 text-white"
+                        : "border-[#15803D]/20 text-[#15803D] hover:bg-[#15803D]/10"
+                    }
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
             </div>
             <Button
               variant="outline"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className="border-[#15803D]/20 text-[#15803D] hover:bg-[#15803D]/10"
             >
@@ -941,11 +1006,15 @@ export default function CommunityPage() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Community Forum</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Community Forum
+            </h1>
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <button
-                  onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
+                  onClick={() =>
+                    setIsNotificationDropdownOpen(!isNotificationDropdownOpen)
+                  }
                   className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
                 >
                   <Bell className="h-6 w-6" />
@@ -959,7 +1028,9 @@ export default function CommunityPage() {
                   <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
                     <div className="px-4 py-2 border-b border-gray-200">
                       <div className="flex justify-between items-center">
-                        <h3 className="text-sm font-medium text-gray-900">Notifications</h3>
+                        <h3 className="text-sm font-medium text-gray-900">
+                          Notifications
+                        </h3>
                         {unreadCount > 0 && (
                           <button
                             onClick={markAllNotificationsAsRead}
@@ -982,11 +1053,17 @@ export default function CommunityPage() {
                             className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${
                               !notification.read ? "bg-blue-50" : ""
                             }`}
-                            onClick={() => markNotificationAsRead(notification.id)}
+                            onClick={() =>
+                              markNotificationAsRead(notification.id)
+                            }
                           >
-                            <p className="text-sm text-gray-900">{notification.message}</p>
+                            <p className="text-sm text-gray-900">
+                              {notification.message}
+                            </p>
                             <p className="text-xs text-gray-500 mt-1">
-                              {new Date(notification.createdAt).toLocaleString()}
+                              {new Date(
+                                notification.createdAt
+                              ).toLocaleString()}
                             </p>
                           </div>
                         ))

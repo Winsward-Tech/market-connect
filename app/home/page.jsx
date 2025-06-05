@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ShoppingBag, Users, User } from "lucide-react";
+import { BookOpen, ShoppingBag, Users, User, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HomeNavbar from "@/components/HomeNavbar";
 import clsx from "clsx";
@@ -55,12 +55,7 @@ function NavCard({ href, image, label, description, color, iconColor }) {
         <CardContent className="p-0 flex flex-col items-center justify-center h-full space-y-3">
           <div className="p-3 rounded-full transition duration-300">
             <div className="relative w-12 h-12">
-              <Image
-                src={image}
-                alt={label}
-                fill
-                className="object-contain"
-              />
+              <Image src={image} alt={label} fill className="object-contain" />
             </div>
           </div>
           <div className="text-center">
@@ -82,7 +77,8 @@ export default function HomeScreen() {
   const { toast } = useToast();
   const [welcomeText, setWelcomeText] = useState({
     title: "Welcome to Market Connect",
-    description: "Your one-stop platform for farming, trading, and community engagement"
+    description:
+      "Your one-stop platform for farming, trading, and community engagement",
   });
   const [navItems, setNavItems] = useState(defaultNavItems);
   const [isTranslating, setIsTranslating] = useState(false);
@@ -90,12 +86,13 @@ export default function HomeScreen() {
   useEffect(() => {
     const handleLanguageChange = async (event) => {
       const { language, translateFunction } = event.detail;
-      
-      if (language === 'en') {
+
+      if (language === "en") {
         // Reset to original text
         setWelcomeText({
           title: "Welcome to Market Connect",
-          description: "Your one-stop platform for farming, trading, and community engagement"
+          description:
+            "Your one-stop platform for farming, trading, and community engagement",
         });
         setNavItems(defaultNavItems);
         return;
@@ -106,12 +103,12 @@ export default function HomeScreen() {
         // Translate welcome text
         const [translatedTitle, translatedDescription] = await Promise.all([
           translateFunction(welcomeText.title, language),
-          translateFunction(welcomeText.description, language)
+          translateFunction(welcomeText.description, language),
         ]);
 
         setWelcomeText({
           title: translatedTitle,
-          description: translatedDescription
+          description: translatedDescription,
         });
 
         // Translate navigation items
@@ -119,13 +116,13 @@ export default function HomeScreen() {
           defaultNavItems.map(async (item) => {
             const [translatedLabel, translatedDescription] = await Promise.all([
               translateFunction(item.label, language),
-              translateFunction(item.description, language)
+              translateFunction(item.description, language),
             ]);
 
             return {
               ...item,
               label: translatedLabel,
-              description: translatedDescription
+              description: translatedDescription,
             };
           })
         );
@@ -143,16 +140,25 @@ export default function HomeScreen() {
       }
     };
 
-    window.addEventListener('languageChanged', handleLanguageChange);
-    return () => window.removeEventListener('languageChanged', handleLanguageChange);
+    window.addEventListener("languageChanged", handleLanguageChange);
+    return () =>
+      window.removeEventListener("languageChanged", handleLanguageChange);
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <HomeNavbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Link href="/">
+            <button
+              aria-label="Back to Main"
+              className="p-2 rounded-full hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              <ArrowLeft className="h-6 w-6 text-green-800" />
+            </button>
+          </Link>
+          <h2 className="flex-1 text-2xl md:text-3xl font-bold text-gray-900 text-center">
             {isTranslating ? (
               <div className="flex items-center justify-center space-x-2">
                 <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
@@ -162,18 +168,19 @@ export default function HomeScreen() {
               welcomeText.title
             )}
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            {isTranslating ? (
-              <div className="flex items-center justify-center space-x-2">
-                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-                <span>Translating...</span>
-              </div>
-            ) : (
-              welcomeText.description
-            )}
-          </p>
         </div>
-
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          {isTranslating ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+              <span>Translating...</span>
+            </div>
+          ) : (
+            welcomeText.description
+          )}
+        </p>
+      </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mt-12 grid grid-cols-1 gap-8 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {navItems.map((item) => (
             <Link
@@ -235,7 +242,12 @@ export default function HomeScreen() {
                 aria-label={`Go to ${item.label}`}
                 className="flex flex-col items-center justify-center py-2 space-y-1"
               >
-                <div className={clsx("w-6 h-6", isActive ? "text-green-700" : item.iconColor)}>
+                <div
+                  className={clsx(
+                    "w-6 h-6",
+                    isActive ? "text-green-700" : item.iconColor
+                  )}
+                >
                   <div className="relative w-6 h-6">
                     <Image
                       src={item.image}
